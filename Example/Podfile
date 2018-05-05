@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'StrangePhotoBrowse_Example' do
+  pod 'StrangePhotoBrowse', :path => '../'
+
+  target 'StrangePhotoBrowse_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
