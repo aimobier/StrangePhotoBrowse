@@ -1,0 +1,16 @@
+PODS:
+  - StrangePhotoBrowse (0.1.0)
+
+DEPENDENCIES:
+  - StrangePhotoBrowse (from `../`)
+
+EXTERNAL SOURCES:
+  StrangePhotoBrowse:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  StrangePhotoBrowse: 87391f7212431048d7630eedb4750ac8eb620ac0
+
+PODFILE CHECKSUM: d8a2e5bfe460437711b42d2f0c701d6616ac660b
+
+COCOAPODS: 1.5.0
