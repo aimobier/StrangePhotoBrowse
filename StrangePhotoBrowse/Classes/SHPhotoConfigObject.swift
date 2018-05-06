@@ -13,12 +13,12 @@ public class SHPhotoConfigObject {
     public var perLineDisplayNumber = 4
     
     /// 上下方的 NavBar ToolBar Back Color
-    public var navBarViewToolViewBackColor = UIColor(red: 39.f/255, green: 42.f/255, blue: 49.f/255, alpha: 1)
+    public var navBarViewToolViewBackColor = UIColor(rgb: 0x272A31)
     
     /// 展示图片的背景颜色
     public var collectionViewBackView = UIColor.black
     
     /// 空白视图的 展位 属性
-    public var emptyTitleAttributeString = "暂无更多图片".withTextColor(UIColor.white.withAlphaComponent(0.4)).withFont(UIFont.boldSystemFont(ofSize: 15))
-    public var emptySubTitleAttributeString = "你可以拍照，或者通过其他方式增加图片".withTextColor(UIColor.white.withAlphaComponent(0.4)).withFont(UIFont.systemFont(ofSize: 13))
+    public var emptyTitleAttributeString = "暂无更多图片".withTextColor(UIColor.white.a4).withFont(UIFont.f15.bold)
+    public var emptySubTitleAttributeString = "你可以拍照，或者通过其他方式增加图片".withTextColor(UIColor.white.a4).withFont(UIFont.f13)
 }

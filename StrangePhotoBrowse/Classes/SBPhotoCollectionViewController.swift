@@ -88,7 +88,7 @@ extension SBPhotoCollectionViewController{
     /// 制作上方的 视图
     private func makeTopNavView(){
         
-        navgationBarView.titleLabel.attributedText = "照片和视频".withFont(UIFont.systemFont(ofSize: 17)).withTextColor(UIColor.white)
+        navgationBarView.titleLabel.attributedText = "照片和视频".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(UIColor.white)
         
         topLayoutView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
         navgationBarView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
