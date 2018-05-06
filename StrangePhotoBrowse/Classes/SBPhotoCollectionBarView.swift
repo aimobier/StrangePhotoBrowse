@@ -28,9 +28,36 @@ class SBPhotoCollectionNavBarView: UIView {
     }
 }
 
-class SBPhotoCollectionNavBarView: UIView {
+protocol SBPhotoCollectionToolBarViewDelegate {
     
-    private let button = UIButton(type: .system)
+    /// 当点击预览按钮
+    ///
+    /// - Parameter button: 预览按钮
+    func didClickPreviewButton(button: UIButton)
+    
+    /// 当点击原图按钮
+    ///
+    /// - Parameter button: 原图按钮
+    func didClickOriginalButton(button: UIButton)
+    
+    /// 当点击选择按钮
+    ///
+    /// - Parameter button: 选择按钮
+    func didClickChoiceButton(button: UIButton)
+}
+
+class SBPhotoCollectionToolBarView: UIView {
+    
+    var delegate:SBPhotoCollectionToolBarViewDelegate?
+    
+    /// 预览按钮
+    private let previewButton = UIButton(type: .system)
+    
+    /// 原图按钮
+    private let originalButton = UIButton(type: .system)
+    
+    /// 选择按钮
+    private let choiceButton = UIButton(type: .system)
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
@@ -40,7 +67,54 @@ class SBPhotoCollectionNavBarView: UIView {
         
         super.init(frame: .zero)
         
-//        self.
+        self.choiceButton.setAttributedTitle("全部照片".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.choiceButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.choiceButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(choiceButton)
+        self.addConstraints([
+            NSLayoutConstraint(item: choiceButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: choiceButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 10),
+            NSLayoutConstraint(item: choiceButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.previewButton.setAttributedTitle("预览".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.previewButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.previewButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(previewButton)
+        self.addConstraints([
+            NSLayoutConstraint(item: previewButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: previewButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: -10),
+            NSLayoutConstraint(item: previewButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.originalButton.setAttributedTitle("原图".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.originalButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.originalButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(originalButton)
+        self.addConstraints([
+            NSLayoutConstraint(item: originalButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: originalButton, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: originalButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.choiceButton.addTarget(self, action: #selector(didClickChoiceButton(button:)), for: .touchUpInside)
+        self.previewButton.addTarget(self, action: #selector(didClickPreviewButton(button:)), for: .touchUpInside)
+        self.originalButton.addTarget(self, action: #selector(didClickOriginalButton(button:)), for: .touchUpInside)
+    }
+    
+    @objc func didClickPreviewButton(button: UIButton){
+        
+        self.delegate?.didClickPreviewButton(button: button)
+    }
+    
+    @objc func didClickOriginalButton(button: UIButton){
+        
+        self.delegate?.didClickOriginalButton(button: button)
+    }
+    
+    @objc func didClickChoiceButton(button: UIButton){
+        
+        self.delegate?.didClickChoiceButton(button: button)
     }
 }
 
@@ -75,3 +149,4 @@ class SBPhotoEmptyView: UIView{
             ])
     }
 }
+

@@ -27,7 +27,7 @@ public class SBPhotoCollectionViewController: UIViewController{
     private let navgationBarView = SBPhotoCollectionNavBarView()
     
     /// ViewController 下方的View
-    private let toolBarView = UIView()
+    private let toolBarView = SBPhotoCollectionToolBarView()
     private let bottomLayoutView = UIView()
     
     /// 默认的 collectionView FlowLayout
@@ -127,6 +127,7 @@ extension SBPhotoCollectionViewController{
             NSLayoutConstraint(item: bottomLayoutView, attribute: .bottom, relatedBy: .equal, toItem: bottomLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0),
             ])
         
+        toolBarView.delegate = self
         view.addSubview(toolBarView)
         toolBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addConstraints([
@@ -316,5 +317,21 @@ extension SBPhotoCollectionViewController: PHPhotoLibraryChangeObserver{
             }
             resetCachedAssets()
         }
+    }
+}
+
+
+extension SBPhotoCollectionViewController: SBPhotoCollectionToolBarViewDelegate{
+    
+    func didClickPreviewButton(button: UIButton) {
+        
+    }
+    
+    func didClickOriginalButton(button: UIButton) {
+        
+    }
+    
+    func didClickChoiceButton(button: UIButton) {
+        
     }
 }
