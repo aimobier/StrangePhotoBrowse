@@ -17,4 +17,8 @@ public class SHPhotoConfigObject {
     
     /// 展示图片的背景颜色
     public var collectionViewBackView = UIColor.black
+    
+    /// 空白视图的 展位 属性
+    public var emptyTitleAttributeString = "暂无更多图片".withTextColor(UIColor.white.withAlphaComponent(0.4)).withFont(UIFont.boldSystemFont(ofSize: 15))
+    public var emptySubTitleAttributeString = "你可以拍照，或者通过其他方式增加图片".withTextColor(UIColor.white.withAlphaComponent(0.4)).withFont(UIFont.systemFont(ofSize: 13))
 }

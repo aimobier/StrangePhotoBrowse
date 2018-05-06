@@ -31,6 +31,9 @@ public class SBPhotoCollectionViewController: UIViewController{
     private let bottomLayoutView = UIView()
     
     /// 默认的 collectionView FlowLayout
+    
+    private var emptyView:SBPhotoEmptyView!
+    
     private var thumbnailSize:CGSize!
     private var previousPreheatRect = CGRect.zero
     private var collectionView : UICollectionView!
@@ -137,6 +140,8 @@ extension SBPhotoCollectionViewController{
     /// 制作展示图片的 CollectionView
     private func makeCollectionView(){
         
+        emptyView = SBPhotoEmptyView(optionConfig.emptyTitleAttributeString, subTitle: optionConfig.emptySubTitleAttributeString)
+        
         let sizeWidth = (SCREENWIDTH-self.optionConfig.perLineDisplayNumber.f-1)/optionConfig.perLineDisplayNumber.f
         
         collectionViewFlowLayout.itemSize = CGSize(width: sizeWidth, height: sizeWidth)
@@ -165,9 +170,16 @@ extension SBPhotoCollectionViewController{
 // MARK: - UICollectionViewDataSource
 extension SBPhotoCollectionViewController: UICollectionViewDataSource{
     
+    private func realmNumber(_ number:Int)-> Int{
+        
+        self.collectionView.backgroundView = number <= 0 ? emptyView : nil
+        
+        return number
+    }
+    
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return fetchResult.count
+        return realmNumber(fetchResult.count)
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
