@@ -212,11 +212,12 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = M6HJ5N9N9V;
+						DevelopmentTeam = CAY8P2B9Z3;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
+						DevelopmentTeam = M6HJ5N9N9V;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -470,7 +471,7 @@
 			baseConfigurationReference = 7EDC79F23B9EA27F02843FBF /* Pods-StrangePhotoBrowse_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = M6HJ5N9N9V;
+				DEVELOPMENT_TEAM = CAY8P2B9Z3;
 				INFOPLIST_FILE = StrangePhotoBrowse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -486,7 +487,7 @@
 			baseConfigurationReference = B5453258C48FB4BB373FD666 /* Pods-StrangePhotoBrowse_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = M6HJ5N9N9V;
+				DEVELOPMENT_TEAM = CAY8P2B9Z3;
 				INFOPLIST_FILE = StrangePhotoBrowse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -501,6 +502,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = AC66544D5789E351683FB0AD /* Pods-StrangePhotoBrowse_Tests.debug.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = M6HJ5N9N9V;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
@@ -522,6 +524,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1A4B622EB2731A0365A355BB /* Pods-StrangePhotoBrowse_Tests.release.xcconfig */;
 			buildSettings = {
+				DEVELOPMENT_TEAM = M6HJ5N9N9V;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
