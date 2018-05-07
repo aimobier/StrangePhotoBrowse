@@ -51,9 +51,9 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
         self.contentView.addSubview(imageView2)
         self.contentView.addSubview(imageView1)
         
-        imageView1.backgroundColor = UIColor.randColor
-        imageView2.backgroundColor = UIColor.randColor
-        imageView3.backgroundColor = UIColor.randColor
+        imageView1.backgroundColor = UIColor.white
+        imageView2.backgroundColor = UIColor.white
+        imageView3.backgroundColor = UIColor.white
         
         self.contentView.addConstraints([
             NSLayoutConstraint(item: imageView1, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 10),
@@ -106,5 +106,27 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
         imageView1.image = nil
         imageView2.image = nil
         imageView3.image = nil
+    }
+    
+    private var borderLayer: CAShapeLayer!
+    
+    override func draw(_ rect: CGRect) {
+        
+        super.draw(rect)
+        
+        if borderLayer != nil {
+            return
+        }
+        
+        let borderPath = UIBezierPath()
+        borderPath.move(to: CGPoint(x: 10, y: rect.height))
+        borderPath.addLine(to: CGPoint(x: rect.width-10, y: rect.height))
+        
+        borderLayer = CAShapeLayer()
+        borderLayer.lineWidth = 0.5
+        borderLayer.strokeColor = UIColor(red: 224, green: 224, blue: 224).cgColor
+        borderLayer.path = borderPath.cgPath
+        
+        self.layer.addSublayer(borderLayer)
     }
 }

@@ -121,6 +121,8 @@ extension SBPhotoChoiceCollectionViewController: UIViewControllerTransitioningDe
 
 class SBPhotoChoiceCollectionViewController: UIViewController{
     
+    typealias IndexPathAssetCollection = (assetCollection:PHAssetCollection?,fetchResults:PHFetchResult<PHAsset>?)
+    
     enum Section: Int {
         case allPhotos = 0
         case smartAlbums
@@ -139,7 +141,11 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     private let tableView = UITableView()
     fileprivate let backView = SBPhotoChoiceTableBackView()
     
+    /// 配置文件
     private let optionConfig:SHPhotoConfigObject
+    
+    /// 缓存器
+    fileprivate var assetCollectionCache = [IndexPath: IndexPathAssetCollection]()
     
     /// ViewController 下方的View
     fileprivate let toolBarView = SBPhotoCollectionToolBarView(.choice)
@@ -158,11 +164,16 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
         fatalError()
     }
     
-    override func viewDidLoad() {
+    private func sortOptions() -> PHFetchOptions{
         
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
-        allPhotos = PHAsset.fetchAssets(with: allPhotosOptions)
+        return allPhotosOptions
+    }
+    
+    override func viewDidLoad() {
+        
+        allPhotos = PHAsset.fetchAssets(with: self.sortOptions())
         smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
         userCollections = PHCollectionList.fetchTopLevelUserCollections(with: nil)
         
@@ -174,6 +185,13 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
         
         makeBottomToolView()
         makeSubViewLayoutMethod()
+        
+        PHPhotoLibrary.shared().register(self)
+    }
+    
+    deinit {
+        
+        PHPhotoLibrary.shared().unregisterChangeObserver(self)
     }
 }
 
@@ -191,6 +209,8 @@ extension SBPhotoChoiceCollectionViewController{
             ])
         
         tableView.register(SBPhotoChoiceTableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        tableView.separatorStyle = .none
         
         tableView.rowHeight = 90
         tableView.estimatedRowHeight = 90
@@ -285,7 +305,11 @@ extension SBPhotoChoiceCollectionViewController: UITableViewDataSource{
     ///
     /// - Parameter indexPath: IndexPath
     /// - Returns: 数据
-    private func getBasicDataBy(_ indexPath: IndexPath) -> (assetCollection:PHAssetCollection?,fetchResults:PHFetchResult<PHAsset>?){
+    private func getBasicDataBy(_ indexPath: IndexPath,cache: Bool = false) -> IndexPathAssetCollection{
+        
+        if cache , let assest = self.assetCollectionCache[indexPath] {
+            return assest
+        }
         
         var fetchResult:PHFetchResult<PHAsset>?
         var collection:PHAssetCollection?
@@ -300,12 +324,14 @@ extension SBPhotoChoiceCollectionViewController: UITableViewDataSource{
         }
         
         if let coll = collection {
-            let sortOptions = PHFetchOptions()
-            sortOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-            fetchResult = PHAsset.fetchAssets(in: coll, options: sortOptions)
+            fetchResult = PHAsset.fetchAssets(in: coll, options: sortOptions())
         }
         
-        return (collection,fetchResult)
+        let assest = (collection,fetchResult)
+        
+        self.assetCollectionCache[indexPath] = assest
+        
+        return assest
     }
 }
 
@@ -336,6 +362,7 @@ extension SBPhotoChoiceCollectionViewController: PHPhotoLibraryChangeObserver {
                 // Update the cached fetch result.
                 allPhotos = changeDetails.fetchResultAfterChanges
                 // (The table row for this one doesn't need updating, it always says "All Photos".)
+                tableView.reloadData()
             }
             
             // Update the cached fetch results, and reload the table sections to match.
@@ -347,6 +374,16 @@ extension SBPhotoChoiceCollectionViewController: PHPhotoLibraryChangeObserver {
             if let changeDetails = changeInstance.changeDetails(for: userCollections) {
                 userCollections = changeDetails.fetchResultAfterChanges
                 tableView.reloadSections(IndexSet(integer: Section.userCollections.rawValue), with: .automatic)
+            }
+            
+            for indexPath in tableView.indexPathsForVisibleRows ?? [IndexPath](){
+                
+                guard let results = self.getBasicDataBy(indexPath,cache: true).fetchResults else { return }
+                
+                if let _ = changeInstance.changeDetails(for: results) {
+                    
+                    tableView.reloadRows(at: [indexPath], with: UITableViewRowAnimation.automatic)
+                }
             }
         }
     }
