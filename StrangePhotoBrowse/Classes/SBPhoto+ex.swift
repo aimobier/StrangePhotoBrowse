@@ -159,7 +159,11 @@ func SBImageMake(_ name:String,color:UIColor? = nil) -> UIImage?{
 }
 
 extension UIImage{
-    
+
+    /// 图片 根据 颜色生成相对应的图片
+    ///
+    /// - Parameter color: 颜色
+    /// - Returns: 图片
     func imageBy(_ color:UIColor) -> UIImage? {
         
         guard let cgimage = self.cgImage else { return self }
@@ -180,9 +184,15 @@ extension UIImage{
         return image
     }
     
+    /// 根据名称 以及 颜色 生成 UIimage
+    ///
+    /// - Parameters:
+    ///   - name: 图片名称
+    ///   - color: 颜色
+    /// - Returns: 图片对象
     static func image(_ name:String,color:UIColor? = nil) -> UIImage?{
         
-        let image = UIImage(named: name, in: Bundle.current, compatibleWith: nil)
+        let image = UIImage(named: name, in: Bundle.current, compatibleWith: nil)?.withRenderingMode(.alwaysOriginal)
         if let col = color {
             return image?.imageBy(col)
         }

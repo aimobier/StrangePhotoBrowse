@@ -7,9 +7,21 @@
 
 import UIKit
 
+protocol SBPhotoCollectionViewCellDelegate {
+    
+    /// 选中了 某个 Cell
+    ///
+    /// - Parameter cell: cell对象
+    func cellDidSelectButtonClick(_ cell: SBPhotoCollectionViewCell)
+}
+
 class SBPhotoCollectionViewCell: UICollectionViewCell {
     
     let imageView = UIImageView()
+    
+    let selectButton = UIButton(type: .system)
+    
+    var delegate:SBPhotoCollectionViewCellDelegate?
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
@@ -20,14 +32,25 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
         
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
-        self.contentView.addSubview(imageView)
+        contentView.addSubview(imageView)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         
-        self.contentView.addConstraints([
-            NSLayoutConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: self.contentView, attribute: .top, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: imageView, attribute: .left, relatedBy: .equal, toItem: self.contentView, attribute: .left, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: imageView, attribute: .right, relatedBy: .equal, toItem: self.contentView, attribute: .right, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: imageView, attribute: .bottom, relatedBy: .equal, toItem: self.contentView, attribute: .bottom, multiplier: 1, constant: 0),
+        contentView.addConstraints([
+            NSLayoutConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: imageView, attribute: .left, relatedBy: .equal, toItem: contentView, attribute: .left, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: imageView, attribute: .right, relatedBy: .equal, toItem: contentView, attribute: .right, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: imageView, attribute: .bottom, relatedBy: .equal, toItem: contentView, attribute: .bottom, multiplier: 1, constant: 0),
+            ])
+        
+        
+        selectButton.addTarget(self, action: #selector(selectButtonClick), for: UIControlEvents.touchUpInside)
+        selectButton.contentEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3)
+        selectButton.setImage(SBImageMake("photo_def_photoPickerVc"), for: .normal)
+        selectButton.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(selectButton)
+        contentView.addConstraints([
+            NSLayoutConstraint(item: selectButton, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: selectButton, attribute: .right, relatedBy: .equal, toItem: contentView, attribute: .right, multiplier: 1, constant: 0),
             ])
     }
     
@@ -42,5 +65,10 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         imageView.image = nil
+    }
+    
+    @objc func selectButtonClick()  {
+        
+        self.delegate?.cellDidSelectButtonClick(self)
     }
 }

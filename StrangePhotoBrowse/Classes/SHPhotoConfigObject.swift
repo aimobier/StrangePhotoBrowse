@@ -9,6 +9,12 @@ import Foundation
 
 public class SHPhotoConfigObject {
     
+    /// 默认的
+    public static let share = SHPhotoConfigObject()
+    
+    /// 主题色
+    public var mainColor = UIColor(rgb: 0x3979e6)
+    
     /// 每一行展示的照片数目
     public var perLineDisplayNumber = 4
     

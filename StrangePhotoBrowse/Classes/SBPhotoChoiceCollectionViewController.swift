@@ -151,8 +151,8 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     fileprivate let toolBarView = SBPhotoCollectionToolBarView(.choice)
     fileprivate let bottomLayoutView = UIView()
     
-    init(optionConfig: SHPhotoConfigObject,delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil) {
-        self.optionConfig = optionConfig
+    init(delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil) {
+        self.optionConfig = SHPhotoConfigObject.share
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
         
