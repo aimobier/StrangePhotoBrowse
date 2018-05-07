@@ -28,22 +28,28 @@ class SBPhotoCollectionNavBarView: UIView {
     }
 }
 
-protocol SBPhotoCollectionToolBarViewDelegate {
+@objc protocol SBPhotoCollectionToolBarViewDelegate {
     
     /// 当点击预览按钮
     ///
     /// - Parameter button: 预览按钮
-    func didClickPreviewButton(button: UIButton)
+    @objc optional func didClickPreviewButton(button: UIButton)
     
     /// 当点击原图按钮
     ///
     /// - Parameter button: 原图按钮
-    func didClickOriginalButton(button: UIButton)
+    @objc optional func didClickOriginalButton(button: UIButton)
     
     /// 当点击选择按钮
     ///
     /// - Parameter button: 选择按钮
-    func didClickChoiceButton(button: UIButton)
+    @objc optional func didClickChoiceButton(button: UIButton)
+    
+    
+    /// 当点击返回按钮
+    ///
+    /// - Parameter button: 选择按钮
+    @objc optional func didClickCancelButton(button: UIButton)
 }
 
 class SBPhotoCollectionToolBarView: UIView {
@@ -51,21 +57,52 @@ class SBPhotoCollectionToolBarView: UIView {
     var delegate:SBPhotoCollectionToolBarViewDelegate?
     
     /// 预览按钮
-    private let previewButton = UIButton(type: .system)
+    let previewButton = UIButton(type: .system)
     
     /// 原图按钮
-    private let originalButton = UIButton(type: .system)
+    let originalButton = UIButton(type: .system)
     
     /// 选择按钮
-    private let choiceButton = UIButton(type: .system)
+    let choiceButton = UIButton(type: .system)
+    
+    /// 返回按钮
+    let cancelButton = UIButton(type: .system)
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
     
-    override init(frame: CGRect) {
+    enum SBPhotoCollectionToolBarStyle{
+        case normal
+        case choice
+    }
+    
+    init(_ style: SBPhotoCollectionToolBarStyle = .normal) {
         
         super.init(frame: .zero)
+        
+        switch style {
+        case .normal: makeNormal()
+        case .choice: makeChoice()
+        }
+    }
+    
+    func makeChoice(){
+        
+        self.cancelButton.setAttributedTitle("返回".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.cancelButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(cancelButton)
+        self.addConstraints([
+            NSLayoutConstraint(item: cancelButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: cancelButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: -10),
+            NSLayoutConstraint(item: cancelButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.cancelButton.addTarget(self, action: #selector(didClickCancelButton(button:)), for: .touchUpInside)
+    }
+    
+    func makeNormal(){
         
         self.choiceButton.setAttributedTitle("全部照片".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
         self.choiceButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
@@ -104,17 +141,30 @@ class SBPhotoCollectionToolBarView: UIView {
     
     @objc func didClickPreviewButton(button: UIButton){
         
-        self.delegate?.didClickPreviewButton(button: button)
+        guard let method =  self.delegate?.didClickPreviewButton else{ return }
+        
+        method(button)
     }
     
     @objc func didClickOriginalButton(button: UIButton){
         
-        self.delegate?.didClickOriginalButton(button: button)
+        guard let method =  self.delegate?.didClickOriginalButton else{ return }
+        
+        method(button)
     }
     
     @objc func didClickChoiceButton(button: UIButton){
         
-        self.delegate?.didClickChoiceButton(button: button)
+        guard let method =  self.delegate?.didClickChoiceButton else{ return }
+        
+        method(button)
+    }
+    
+    @objc func didClickCancelButton(button: UIButton){
+        
+        guard let method =  self.delegate?.didClickCancelButton else{ return }
+        
+        method(button)
     }
 }
 

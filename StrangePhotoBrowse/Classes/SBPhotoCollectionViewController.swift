@@ -56,6 +56,16 @@ public class SBPhotoCollectionViewController: UIViewController{
         return .lightContent
     }
     
+    override public var title: String?{
+        
+        didSet{
+            
+            let title = (self.title ?? "").withFont(UIFont.f13.bold).withTextColor(UIColor.white)
+            
+            toolBarView.choiceButton.setAttributedTitle(title, for: .normal)
+        }
+    }
+    
     override public func viewDidLoad() {
         
         super.viewDidLoad()
@@ -88,7 +98,7 @@ extension SBPhotoCollectionViewController{
     /// 制作上方的 视图
     private func makeTopNavView(){
         
-        navgationBarView.titleLabel.attributedText = "照片和视频".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(UIColor.white)
+        navgationBarView.titleLabel.attributedText = "照片".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(UIColor.white)
         
         topLayoutView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
         navgationBarView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
@@ -333,5 +343,25 @@ extension SBPhotoCollectionViewController: SBPhotoCollectionToolBarViewDelegate{
     
     func didClickChoiceButton(button: UIButton) {
         
+        self.present(SBPhotoChoiceCollectionViewController(optionConfig: optionConfig,delegate: self), animated: true, completion: nil)
+    }
+}
+
+
+extension SBPhotoCollectionViewController: SBPhotoChoiceCollectionViewControllerDelegate{
+    
+    func didChioce(assetCollection: PHAssetCollection?, fetchResults: PHFetchResult<PHAsset>) {
+        
+        if self.fetchResult == fetchResults{
+            return
+        }
+        
+        self.title = assetCollection?.localizedTitle ?? "全部照片"
+        
+        self.dismiss(animated: true, completion: nil)
+        
+        self.fetchResult = fetchResults
+        
+        self.collectionView.reloadData()
     }
 }

@@ -8,17 +8,20 @@
 import UIKit
 
 extension Int{
+    var s:String { return "\(self)" }
     var d:Double { return Double(self) }
     var f:CGFloat { return CGFloat(self) }
 }
 
 extension Double{
     var i:Int { return Int(self) }
+    var s:String { return "\(self)" }
     var f:CGFloat { return CGFloat(self) }
 }
 
 extension CGFloat{
     var i:Int { return Int(self) }
+    var s:String { return "\(self)" }
     var d:Double { return Double(self) }
 }
 
@@ -89,6 +92,11 @@ extension UIFont{
 
 extension UIColor{
     
+    /// 随机颜色
+    static var randColor:UIColor{
+        return UIColor(hue: drand48().f, saturation: drand48().f, brightness: drand48().f, alpha: 1)
+    }
+    
     /// 根据 红 绿 蓝 创建颜色
     ///
     /// - Parameters:
@@ -119,6 +127,7 @@ extension UIColor{
         )
     }
     
+    var a0: UIColor { return self.withAlphaComponent(0) }
     var a1: UIColor { return self.withAlphaComponent(0.1) }
     var a2: UIColor { return self.withAlphaComponent(0.2) }
     var a3: UIColor { return self.withAlphaComponent(0.3) }
@@ -130,3 +139,11 @@ extension UIColor{
     var a9: UIColor { return self.withAlphaComponent(0.9) }
 }
 
+
+extension Collection {
+    
+    /// Returns the element at the specified index iff it is within bounds, otherwise nil.
+    subscript (safe index: Index) -> Element? {
+        return indices.contains(index) ? self[index] : nil
+    }
+}

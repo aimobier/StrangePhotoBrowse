@@ -212,7 +212,7 @@
 				TargetAttributes = {
 					607FACCF1AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = CAY8P2B9Z3;
+						DevelopmentTeam = M6HJ5N9N9V;
 						LastSwiftMigration = 0900;
 					};
 					607FACE41AFB9204008FA782 = {
@@ -471,7 +471,7 @@
 			baseConfigurationReference = 7EDC79F23B9EA27F02843FBF /* Pods-StrangePhotoBrowse_Example.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = CAY8P2B9Z3;
+				DEVELOPMENT_TEAM = M6HJ5N9N9V;
 				INFOPLIST_FILE = StrangePhotoBrowse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -487,7 +487,7 @@
 			baseConfigurationReference = B5453258C48FB4BB373FD666 /* Pods-StrangePhotoBrowse_Example.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = CAY8P2B9Z3;
+				DEVELOPMENT_TEAM = M6HJ5N9N9V;
 				INFOPLIST_FILE = StrangePhotoBrowse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
