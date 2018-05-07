@@ -32,9 +32,9 @@ TODO: Add long description of the pod here.
 
   s.source_files = 'StrangePhotoBrowse/Classes/**/*'
   
-  # s.resource_bundles = {
-  #   'StrangePhotoBrowse' => ['StrangePhotoBrowse/Assets/*.png']
-  # }
+   s.resource_bundles = {
+     'StrangePhotoBrowse' => ['StrangePhotoBrowse/Assets/*.xcassets']
+   }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'

@@ -147,3 +147,57 @@ extension Collection {
         return indices.contains(index) ? self[index] : nil
     }
 }
+
+/// 获取一个 当前 Bundle curren 中的一张图片
+///
+/// - Parameters:
+///   - name: 图片名称
+///   - color: 图片颜色
+/// - Returns: 图片对象
+func SBImageMake(_ name:String,color:UIColor? = nil) -> UIImage?{
+    return UIImage.image(name, color: color)
+}
+
+extension UIImage{
+    
+    func imageBy(_ color:UIColor) -> UIImage? {
+        
+        guard let cgimage = self.cgImage else { return self }
+        
+        UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
+        let context = UIGraphicsGetCurrentContext()
+        context?.translateBy(x: 0, y: size.height)
+        context?.scaleBy(x: 1, y: -1)
+        context?.setBlendMode(.normal)
+        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        context?.clip(to: rect, mask: cgimage)
+        color.setFill()
+        context?.fill(rect)
+        
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image
+    }
+    
+    static func image(_ name:String,color:UIColor? = nil) -> UIImage?{
+        
+        let image = UIImage(named: name, in: Bundle.current, compatibleWith: nil)
+        if let col = color {
+            return image?.imageBy(col)
+        }
+        return image
+    }
+}
+
+extension Bundle{
+    
+    /// 当前的 Bundle
+    static let current: Bundle = {
+        let cbundle = Bundle(for: SBPhotoCollectionViewCell.classForCoder())
+        if let bundleURL = cbundle.url(forResource: "StrangePhotoBrowse", withExtension: "bundle"),let bundle = Bundle(url: bundleURL)  {
+            return bundle
+        }
+        return cbundle
+    }()
+}

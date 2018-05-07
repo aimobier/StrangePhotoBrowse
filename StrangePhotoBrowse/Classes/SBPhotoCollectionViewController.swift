@@ -156,7 +156,7 @@ extension SBPhotoCollectionViewController{
         let sizeWidth = (SCREENWIDTH-self.optionConfig.perLineDisplayNumber.f-1)/optionConfig.perLineDisplayNumber.f
         
         collectionViewFlowLayout.itemSize = CGSize(width: sizeWidth, height: sizeWidth)
-        collectionViewFlowLayout.minimumLineSpacing = 1
+        collectionViewFlowLayout.minimumLineSpacing = 1.5
         collectionViewFlowLayout.minimumInteritemSpacing = 1
         
         let scale = UIScreen.main.scale
@@ -201,7 +201,6 @@ extension SBPhotoCollectionViewController: UICollectionViewDataSource{
             else { fatalError("unexpected cell in collection view") }
         
         cell.representedAssetIdentifier = asset.localIdentifier
-        
         imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
             // The cell may have been recycled by the time this handler gets called;
             // set the cell's thumbnail image only if it's still showing the same asset.
