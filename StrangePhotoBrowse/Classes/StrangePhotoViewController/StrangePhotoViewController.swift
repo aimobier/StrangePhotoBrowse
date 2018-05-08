@@ -1,5 +1,5 @@
 //
-//  StrangePhotoBrowseViewController.swift
+//  StrangePhotoViewController.swift
 //  Pods-StrangePhotoBrowse_Example
 //
 //  Created by 荆文征 on 2018/5/5.
@@ -17,7 +17,7 @@ private extension UICollectionView {
     }
 }
 
-public class StrangePhotoBrowseViewController: UIViewController{
+public class StrangePhotoViewController: UIViewController{
     
     /// ViewController 上方的View
     private let topLayoutView = UIView()
@@ -94,7 +94,7 @@ public class StrangePhotoBrowseViewController: UIViewController{
 }
 
 // MARK: - Layout Methods
-extension StrangePhotoBrowseViewController{
+extension StrangePhotoViewController{
     
     /// 制作上方的 视图
     private func makeTopNavView(){
@@ -181,7 +181,7 @@ extension StrangePhotoBrowseViewController{
 }
 
 // MARK: - UICollectionViewDataSource
-extension StrangePhotoBrowseViewController: UICollectionViewDataSource,SBPhotoCollectionViewCellDelegate{
+extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollectionViewCellDelegate{
     
     private func realmNumber(_ number:Int)-> Int{
         
@@ -272,7 +272,7 @@ extension StrangePhotoBrowseViewController: UICollectionViewDataSource,SBPhotoCo
 
 
 // MARK: - UICollectionViewDelegateFlowLayout
-extension StrangePhotoBrowseViewController: UICollectionViewDelegateFlowLayout{
+extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
     
     // MARK: UIScrollView
     
@@ -343,11 +343,16 @@ extension StrangePhotoBrowseViewController: UICollectionViewDelegateFlowLayout{
             return ([new], [old])
         }
     }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        print("s")
+    }
 }
 
 
 // MARK: - PHPhotoLibraryChangeObserver
-extension StrangePhotoBrowseViewController: PHPhotoLibraryChangeObserver{
+extension StrangePhotoViewController: PHPhotoLibraryChangeObserver{
     
     public func photoLibraryDidChange(_ changeInstance: PHChange) {
         
@@ -387,7 +392,7 @@ extension StrangePhotoBrowseViewController: PHPhotoLibraryChangeObserver{
 }
 
 
-extension StrangePhotoBrowseViewController: SBPhotoCollectionToolBarViewDelegate{
+extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate{
     
     func didClickPreviewButton(button: UIButton) {
         
@@ -406,7 +411,7 @@ extension StrangePhotoBrowseViewController: SBPhotoCollectionToolBarViewDelegate
 }
 
 
-extension StrangePhotoBrowseViewController: SBPhotoChoiceCollectionViewControllerDelegate{
+extension StrangePhotoViewController: SBPhotoChoiceCollectionViewControllerDelegate{
     
     func didChioce(assetCollection: PHAssetCollection?, fetchResults: PHFetchResult<PHAsset>) {
         

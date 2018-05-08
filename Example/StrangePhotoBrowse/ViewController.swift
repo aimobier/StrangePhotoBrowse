@@ -15,16 +15,13 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        
-        
-        let assetCollections = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
-        
-        (0..<assetCollections.count).forEach(){ print(assetCollections.object(at: $0).localizedTitle) }
+        SBPhotoConfigObject.share.mainColor = UIColor(red: 26/255.0, green: 178/255.0, blue: 10/255.0, alpha: 1)
+        SBPhotoConfigObject.share.collectionViewBackViewBackgroundColor = UIColor.white
     }
 
     @IBAction func click(_ sender: Any) {
         
-        self.present(SBPhotoCollectionViewController(), animated: true, completion: nil)
+        self.present(StrangePhotoViewController(), animated: true, completion: nil)
     }
 }
 
