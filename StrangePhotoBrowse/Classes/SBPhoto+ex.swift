@@ -166,22 +166,41 @@ extension UIImage{
     /// - Returns: 图片
     func imageBy(_ color:UIColor) -> UIImage? {
         
-        guard let cgimage = self.cgImage else { return self }
+        let image = self
         
-        UIGraphicsBeginImageContextWithOptions(self.size, false, self.scale)
-        let context = UIGraphicsGetCurrentContext()
-        context?.translateBy(x: 0, y: size.height)
-        context?.scaleBy(x: 1, y: -1)
-        context?.setBlendMode(.normal)
-        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
-        context?.clip(to: rect, mask: cgimage)
-        color.setFill()
-        context?.fill(rect)
+        let backgroundSize = image.size
+        UIGraphicsBeginImageContextWithOptions(backgroundSize, false, UIScreen.main.scale)
         
-        let image = UIGraphicsGetImageFromCurrentImageContext()
+        let ctx = UIGraphicsGetCurrentContext()!
+        
+        var backgroundRect=CGRect()
+        backgroundRect.size = backgroundSize
+        backgroundRect.origin.x = 0
+        backgroundRect.origin.y = 0
+        
+        var r:CGFloat = 0
+        var g:CGFloat = 0
+        var b:CGFloat = 0
+        var a:CGFloat = 0
+        color.getRed(&r, green: &g, blue: &b, alpha: &a)
+        ctx.setFillColor(red: r, green: g, blue: b, alpha: a)
+        ctx.fill(backgroundRect)
+        
+        var imageRect = CGRect()
+        imageRect.size = image.size
+        imageRect.origin.x = (backgroundSize.width - image.size.width) / 2
+        imageRect.origin.y = (backgroundSize.height - image.size.height) / 2
+        
+        // Unflip the image
+        ctx.translateBy(x: 0, y: backgroundSize.height)
+        ctx.scaleBy(x: 1.0, y: -1.0)
+        
+        ctx.setBlendMode(.destinationIn)
+        ctx.draw(image.cgImage!, in: imageRect)
+        
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
-        return image
+        return newImage
     }
     
     /// 根据名称 以及 颜色 生成 UIimage
@@ -189,10 +208,14 @@ extension UIImage{
     /// - Parameters:
     ///   - name: 图片名称
     ///   - color: 颜色
+    ///   - noColor: 不需要 tintColor
     /// - Returns: 图片对象
-    static func image(_ name:String,color:UIColor? = nil) -> UIImage?{
+    static func image(_ name:String,color:UIColor? = nil,noColor:Bool=true) -> UIImage?{
         
-        let image = UIImage(named: name, in: Bundle.current, compatibleWith: nil)?.withRenderingMode(.alwaysOriginal)
+        var image = UIImage(named: name, in: Bundle.current, compatibleWith: nil)
+        if noColor {
+            image = image?.withRenderingMode(.alwaysOriginal)
+        }
         if let col = color {
             return image?.imageBy(col)
         }

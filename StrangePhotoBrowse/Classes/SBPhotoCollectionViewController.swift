@@ -38,6 +38,7 @@ public class SBPhotoCollectionViewController: UIViewController{
     
     /// 当前视图的
     private let imageManager = PHCachingImageManager()
+    private var assetCollection: PHAssetCollection?
     private var fetchResult: PHFetchResult<PHAsset>!
     
     /// 默认的全部照片
@@ -202,9 +203,7 @@ extension SBPhotoCollectionViewController: UICollectionViewDataSource,SBPhotoCol
         
         cell.delegate = self
         
-        cell.selectButton.setImage(self.selectedAsset.contains(asset) ?
-            SBImageMake("photo_sel_photoPickerVc", color: SHPhotoConfigObject.share.mainColor) :
-            SBImageMake("photo_def_previewVc"), for: .normal)
+        cell.selectButton.setImage(self.selectedAsset.contains(asset) ? SHPhotoConfigObject.share.pickerSelectedImage : SHPhotoConfigObject.share.pickerDefaultImage, for: .normal)
         
         cell.representedAssetIdentifier = asset.localIdentifier
         imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
@@ -365,7 +364,9 @@ extension SBPhotoCollectionViewController: SBPhotoCollectionToolBarViewDelegate{
     
     func didClickChoiceButton(button: UIButton) {
         
-        self.present(SBPhotoChoiceCollectionViewController(delegate: self), animated: true, completion: nil)
+        let viewController = SBPhotoChoiceCollectionViewController(delegate: self, assetCollection: self.assetCollection)
+        
+        self.present(viewController, animated: true, completion: nil)
     }
 }
 
@@ -383,6 +384,7 @@ extension SBPhotoCollectionViewController: SBPhotoChoiceCollectionViewController
         self.dismiss(animated: true, completion: nil)
         
         self.fetchResult = fetchResults
+        self.assetCollection = assetCollection
         
         self.collectionView.reloadData()
     }

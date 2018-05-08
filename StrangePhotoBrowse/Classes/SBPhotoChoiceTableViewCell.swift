@@ -20,6 +20,8 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
     let countLabel = UILabel()
     
+    let selectedImageView = UIImageView(image: SHPhotoConfigObject.share.pickerSelectedImage)
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -91,6 +93,12 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
             NSLayoutConstraint(item: countLabel, attribute: .centerY, relatedBy: .equal, toItem: imageView1, attribute: .centerY, multiplier: 1, constant: 10),
             ])
         
+        selectedImageView.translatesAutoresizingMaskIntoConstraints = false
+        self.contentView.addSubview(selectedImageView)
+        self.contentView.addConstraints([
+            NSLayoutConstraint(item: selectedImageView, attribute: .centerY, relatedBy: .equal, toItem: contentView, attribute: .centerY, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: selectedImageView, attribute: .right, relatedBy: .equal, toItem: contentView, attribute: .right, multiplier: 1, constant: -10),
+            ])
     }
     
     var representedAssetIdentifier: String!
@@ -98,6 +106,7 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
     var thumbnailImage: UIImage! {
         didSet {
             imageView1.image = thumbnailImage
+            selectedImageView.isHidden = true
         }
     }
     

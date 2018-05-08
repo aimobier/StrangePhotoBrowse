@@ -144,6 +144,9 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     /// 配置文件
     private let optionConfig:SHPhotoConfigObject
     
+    /// 选中的相册
+    private var assetCollection:PHAssetCollection?
+    
     /// 缓存器
     fileprivate var assetCollectionCache = [IndexPath: IndexPathAssetCollection]()
     
@@ -151,10 +154,12 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     fileprivate let toolBarView = SBPhotoCollectionToolBarView(.choice)
     fileprivate let bottomLayoutView = UIView()
     
-    init(delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil) {
+    init(delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil,assetCollection:PHAssetCollection?) {
         self.optionConfig = SHPhotoConfigObject.share
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
+        
+        self.assetCollection = assetCollection
         
         self.modalPresentationStyle = .custom
         self.transitioningDelegate = self
@@ -283,6 +288,12 @@ extension SBPhotoChoiceCollectionViewController: UITableViewDataSource{
         
         cell.titleLabel.attributedText = title.withFont(.f15).withTextColor(UIColor.black)
         cell.countLabel.attributedText = "\(cStr)张".withFont(.f13).withTextColor(UIColor.black.a5)
+        
+        cell.selectedImageView.isHidden = true
+        if (basicData.assetCollection?.localizedTitle == nil && self.assetCollection == nil) || basicData.assetCollection?.localIdentifier == self.assetCollection?.localIdentifier{
+            
+            cell.selectedImageView.isHidden = false
+        }
         
         DispatchQueue.global(qos: .background).async {
             // Background Thread

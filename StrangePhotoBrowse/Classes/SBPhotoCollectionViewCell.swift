@@ -45,7 +45,6 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
         
         selectButton.addTarget(self, action: #selector(selectButtonClick), for: UIControlEvents.touchUpInside)
         selectButton.contentEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3)
-        selectButton.setImage(SBImageMake("photo_def_photoPickerVc"), for: .normal)
         selectButton.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(selectButton)
         contentView.addConstraints([
