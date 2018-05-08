@@ -401,37 +401,3 @@ extension SBPhotoChoiceCollectionViewController: SBPhotoCollectionToolBarViewDel
     }
 }
 
-extension PHFetchResult where ObjectType == PHAsset{
-    
-    /// 获取前几张图片
-    ///
-    /// - Parameter count: 前几张
-    /// - Returns: 图片结合
-    func getFirstPicture(is count:Int) -> [UIImage]{
-        
-        let scale = UIScreen.main.scale
-        let thumbnailSize = CGSize(width: 66*scale, height: 66*scale)
-        
-        let images = self.objects(at: IndexSet(integersIn: 0..<(min(count, self.count)))).map { (asset) -> UIImage? in
-            
-            var rimage:UIImage?
-            
-            let options = PHImageRequestOptions()
-            options.isSynchronous = true
-            
-            PHImageManager.default().requestImage(for: asset,
-                                                  targetSize: thumbnailSize,
-                                                  contentMode: .aspectFill,
-                                                  options: options) { (image, _) in
-                                                    rimage = image
-            }
-            
-            return rimage
-        }
-        
-        let realImages = images.filter(){ $0 != nil }.map{ $0! }
-        
-        return realImages
-    }
-}
-

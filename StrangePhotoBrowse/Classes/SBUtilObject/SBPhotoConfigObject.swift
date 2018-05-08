@@ -36,4 +36,7 @@ public class SBPhotoConfigObject {
     /// 空白视图的 展位 属性
     public var emptyTitleAttributeString = "暂无更多图片".withTextColor(UIColor.white.a4).withFont(UIFont.f15.bold)
     public var emptySubTitleAttributeString = "你可以拍照，或者通过其他方式增加图片".withTextColor(UIColor.white.a4).withFont(UIFont.f13)
+    
+    /// 两个分页视图之间的距离
+    public var pageViewControllerOptionInterPageSpace = 10.f
 }

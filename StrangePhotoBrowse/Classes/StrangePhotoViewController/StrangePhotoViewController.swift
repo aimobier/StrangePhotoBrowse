@@ -33,13 +33,13 @@ public class StrangePhotoViewController: UIViewController{
     
     private var thumbnailSize:CGSize!
     private var previousPreheatRect = CGRect.zero
-    private var collectionView : UICollectionView!
+    var collectionView : UICollectionView!
     private let collectionViewFlowLayout = UICollectionViewFlowLayout()
     
     /// 当前视图的
     private let imageManager = PHCachingImageManager()
     private var assetCollection: PHAssetCollection?
-    private var fetchResult: PHFetchResult<PHAsset>!
+    var fetchResult: PHFetchResult<PHAsset>!
     
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
@@ -346,7 +346,9 @@ extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        print("s")
+        let viewController = SBImageBrowserViewController(viewController: self, currentIndex: indexPath.row)
+        
+        self.present(viewController, animated: true, completion: nil)
     }
 }
 
