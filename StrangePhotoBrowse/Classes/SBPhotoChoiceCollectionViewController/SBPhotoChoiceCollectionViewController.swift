@@ -8,7 +8,6 @@
 import UIKit
 import Photos
 
-
 class SBPhotoChoiceCollectionViewControllerPresentedAnimatedTransitioning:NSObject, UIViewControllerAnimatedTransitioning{
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
@@ -78,7 +77,6 @@ class SBPhotoChoiceCollectionViewControllerDismissedAnimatedTransitioning:NSObje
     }
 }
 
-
 protocol SBPhotoChoiceCollectionViewControllerDelegate {
     
     /// 用户选择了 其他的相册
@@ -87,23 +85,6 @@ protocol SBPhotoChoiceCollectionViewControllerDelegate {
     ///   - assetCollection: 相册对象
     ///   - fetchResults: 相册内的数据
     func didChioce(assetCollection:PHAssetCollection?,fetchResults:PHFetchResult<PHAsset>)
-}
-
-class SBPhotoChoiceTableBackView: UIView{
-    
-    var maskLayer: CAShapeLayer!
-    
-    override func draw(_ rect: CGRect) {
-        
-        super.draw(rect)
-        
-        if maskLayer != nil { return }
-        
-        maskLayer = CAShapeLayer()
-        maskLayer.path = UIBezierPath(roundedRect: rect, byRoundingCorners: [.topLeft,.topRight], cornerRadii: CGSize(width: 10, height: 10)).cgPath
-        
-        self.layer.mask = maskLayer
-    }
 }
 
 extension SBPhotoChoiceCollectionViewController: UIViewControllerTransitioningDelegate{
