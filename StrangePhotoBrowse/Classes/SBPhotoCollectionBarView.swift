@@ -89,7 +89,7 @@ class SBPhotoCollectionToolBarView: UIView {
     
     func makeChoice(){
         
-        self.cancelButton.setAttributedTitle("返回".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.cancelButton.setAttributedTitle("返回".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.cancelButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         self.cancelButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(cancelButton)
@@ -104,7 +104,7 @@ class SBPhotoCollectionToolBarView: UIView {
     
     func makeNormal(){
         
-        self.choiceButton.setAttributedTitle("全部照片".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.choiceButton.setAttributedTitle("全部照片".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.choiceButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         self.choiceButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(choiceButton)
@@ -114,7 +114,7 @@ class SBPhotoCollectionToolBarView: UIView {
             NSLayoutConstraint(item: choiceButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
             ])
         
-        self.previewButton.setAttributedTitle("预览".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.previewButton.setAttributedTitle("预览".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.previewButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         self.previewButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(previewButton)
@@ -124,7 +124,7 @@ class SBPhotoCollectionToolBarView: UIView {
             NSLayoutConstraint(item: previewButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
             ])
         
-        self.originalButton.setAttributedTitle("原图".withTextColor(.white).withFont(UIFont.f13.bold), for: .normal)
+        self.originalButton.setAttributedTitle("原图".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.originalButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         self.originalButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(originalButton)

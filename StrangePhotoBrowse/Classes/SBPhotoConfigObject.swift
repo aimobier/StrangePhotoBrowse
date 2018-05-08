@@ -1,5 +1,5 @@
 //
-//  SHPhotoConfigObject.swift
+//  SBPhotoConfigObject.swift
 //  Pods-StrangePhotoBrowse_Example
 //
 //  Created by 荆文征 on 2018/5/5.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-public class SHPhotoConfigObject {
+public class SBPhotoConfigObject {
     
     /// 默认的
-    public static let share = SHPhotoConfigObject()
+    public static let share = SBPhotoConfigObject()
     
     /// 主题色
     public var mainColor = UIColor(rgb: 0x3979e6)
@@ -19,14 +19,18 @@ public class SHPhotoConfigObject {
     public var perLineDisplayNumber = 4
     
     /// 上下方的 NavBar ToolBar Back Color
-    public var navBarViewToolViewBackColor = UIColor(rgb: 0x272A31)
+    public var navBarViewToolViewTitleTextColor = UIColor.white
+    /// 上下方的 NavBar ToolBar Title Text Color
+    public var navBarViewToolViewBackgroundColor = UIColor(rgb: 0x272A31)
     
     /// 展示图片的背景颜色
-    public var collectionViewBackView = UIColor.black
+    public var collectionViewBackViewBackgroundColor = UIColor.black
     
+    /// 选中 时候 是否显示 Index 选中的 Index
+    public var pickerSelectIndexMode = true
     /// 默认的图片 推荐大小 27*27
     public var pickerDefaultImage = SBImageMake("photo_def_photoPickerVc")
-    /// 选中的图片 推荐大小 27*27
+    /// 选中的图片 推荐大小 27*27 pickerSelectIndexMode 为true 则 不展示该 UIImage
     public var pickerSelectedImage = SBImageMake("photo_sel_photoPickerVc")
     
     /// 空白视图的 展位 属性

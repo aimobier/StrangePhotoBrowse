@@ -142,7 +142,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     fileprivate let backView = SBPhotoChoiceTableBackView()
     
     /// 配置文件
-    private let optionConfig:SHPhotoConfigObject
+    private let optionConfig:SBPhotoConfigObject
     
     /// 选中的相册
     private var assetCollection:PHAssetCollection?
@@ -155,7 +155,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     fileprivate let bottomLayoutView = UIView()
     
     init(delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil,assetCollection:PHAssetCollection?) {
-        self.optionConfig = SHPhotoConfigObject.share
+        self.optionConfig = SBPhotoConfigObject.share
         self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
         
@@ -236,8 +236,8 @@ extension SBPhotoChoiceCollectionViewController{
     /// 制作上方的 视图
     private func makeBottomToolView(){
         
-        bottomLayoutView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
-        toolBarView.backgroundColor = self.optionConfig.navBarViewToolViewBackColor
+        bottomLayoutView.backgroundColor = self.optionConfig.navBarViewToolViewBackgroundColor
+        toolBarView.backgroundColor = self.optionConfig.navBarViewToolViewBackgroundColor
         
         view.addSubview(bottomLayoutView)
         bottomLayoutView.translatesAutoresizingMaskIntoConstraints  = false

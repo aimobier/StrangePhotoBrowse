@@ -61,7 +61,7 @@ public class SBPhotoCollectionViewController: UIViewController{
         
         didSet{
             
-            let title = (self.title ?? "").withFont(UIFont.f13.bold).withTextColor(UIColor.white)
+            let title = (self.title ?? "").withFont(UIFont.f13.bold).withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor)
             
             toolBarView.choiceButton.setAttributedTitle(title, for: .normal)
         }
@@ -75,7 +75,7 @@ public class SBPhotoCollectionViewController: UIViewController{
         
         PHPhotoLibrary.shared().register(self)
         
-        self.view.backgroundColor = SHPhotoConfigObject.share.collectionViewBackView
+        self.view.backgroundColor = SBPhotoConfigObject.share.collectionViewBackViewBackgroundColor
         
         makeTopNavView()
         makeBottomToolView()
@@ -99,10 +99,10 @@ extension SBPhotoCollectionViewController{
     /// 制作上方的 视图
     private func makeTopNavView(){
         
-        navgationBarView.titleLabel.attributedText = "照片".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(UIColor.white)
+        navgationBarView.titleLabel.attributedText = "照片".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor)
         
-        topLayoutView.backgroundColor = SHPhotoConfigObject.share.navBarViewToolViewBackColor
-        navgationBarView.backgroundColor = SHPhotoConfigObject.share.navBarViewToolViewBackColor
+        topLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
+        navgationBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
         view.addSubview(navgationBarView)
         navgationBarView.translatesAutoresizingMaskIntoConstraints = false
@@ -126,8 +126,8 @@ extension SBPhotoCollectionViewController{
     /// 制作上方的 视图
     private func makeBottomToolView(){
         
-        bottomLayoutView.backgroundColor = SHPhotoConfigObject.share.navBarViewToolViewBackColor
-        toolBarView.backgroundColor = SHPhotoConfigObject.share.navBarViewToolViewBackColor
+        bottomLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
+        toolBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
         view.addSubview(bottomLayoutView)
         bottomLayoutView.translatesAutoresizingMaskIntoConstraints  = false
@@ -152,9 +152,9 @@ extension SBPhotoCollectionViewController{
     /// 制作展示图片的 CollectionView
     private func makeCollectionView(){
         
-        emptyView = SBPhotoEmptyView(SHPhotoConfigObject.share.emptyTitleAttributeString, subTitle: SHPhotoConfigObject.share.emptySubTitleAttributeString)
+        emptyView = SBPhotoEmptyView(SBPhotoConfigObject.share.emptyTitleAttributeString, subTitle: SBPhotoConfigObject.share.emptySubTitleAttributeString)
         
-        let sizeWidth = (SCREENWIDTH-SHPhotoConfigObject.share.perLineDisplayNumber.f-1)/SHPhotoConfigObject.share.perLineDisplayNumber.f
+        let sizeWidth = (SCREENWIDTH-SBPhotoConfigObject.share.perLineDisplayNumber.f-1)/SBPhotoConfigObject.share.perLineDisplayNumber.f
         
         collectionViewFlowLayout.itemSize = CGSize(width: sizeWidth, height: sizeWidth)
         collectionViewFlowLayout.minimumLineSpacing = 1.5
@@ -165,6 +165,7 @@ extension SBPhotoCollectionViewController{
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: collectionViewFlowLayout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = SBPhotoConfigObject.share.collectionViewBackViewBackgroundColor
         view.addSubview(collectionView)
         view.addConstraints([
             NSLayoutConstraint(item: collectionView, attribute: .top, relatedBy: .equal, toItem: navgationBarView, attribute: .bottom, multiplier: 1, constant: 0),
@@ -203,7 +204,7 @@ extension SBPhotoCollectionViewController: UICollectionViewDataSource,SBPhotoCol
         
         cell.delegate = self
         
-        cell.selectButton.setImage(self.selectedAsset.contains(asset) ? SHPhotoConfigObject.share.pickerSelectedImage : SHPhotoConfigObject.share.pickerDefaultImage, for: .normal)
+        cell.selectButton.sb_setSelected(index: self.selectedAsset.index(of: asset))
         
         cell.representedAssetIdentifier = asset.localIdentifier
         imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
@@ -226,12 +227,41 @@ extension SBPhotoCollectionViewController: UICollectionViewDataSource,SBPhotoCol
         let asset = fetchResult.object(at: index.item)
         
         if let index = selectedAsset.index(of: asset) {
+            
             selectedAsset.remove(at: index)
+            cell.selectButton.sb_setSelected(index: selectedAsset.index(of: asset), animate: true)
+            reloadIndexAfterMethod(index: index)
+            
         }else{
+        
             selectedAsset.append(asset)
+            cell.selectButton.sb_setSelected(index: selectedAsset.index(of: asset), animate: true)
+        }
+    }
+    
+    /// 刷新 index 之后的 选中视图
+    ///
+    /// - Parameter index: index
+    func reloadIndexAfterMethod(index:Int){
+        
+        var indexPaths = [IndexPath]()
+        
+        for asset in self.selectedAsset[index...(self.selectedAsset.count-1)]{
+            
+            let index = self.fetchResult.index(of: asset)
+            
+            let indexPath = IndexPath(item: index, section: 0)
+            
+            if self.collectionView.indexPathsForVisibleItems.contains(indexPath) {
+                
+                indexPaths.append(indexPath)
+            }
         }
         
-        self.collectionView.reloadItems(at: [index])
+        if indexPaths.count > 0 {
+            
+            self.collectionView.reloadItems(at: indexPaths)
+        }
     }
 }
 

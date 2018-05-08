@@ -59,7 +59,11 @@ extension NSMutableAttributedString{
 }
 
 extension UIFont{
-
+    
+    static let f10: UIFont = {
+        return UIFont.systemFont(ofSize: 10)
+    }()
+    
     static let f13: UIFont = {
         return UIFont.systemFont(ofSize: 13)
     }()

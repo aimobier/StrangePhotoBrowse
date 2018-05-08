@@ -20,7 +20,7 @@ class SBPhotoChoiceTableViewCell: UITableViewCell {
     let titleLabel = UILabel()
     let countLabel = UILabel()
     
-    let selectedImageView = UIImageView(image: SHPhotoConfigObject.share.pickerSelectedImage)
+    let selectedImageView = UIImageView(image: SBPhotoConfigObject.share.pickerSelectedImage)
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
