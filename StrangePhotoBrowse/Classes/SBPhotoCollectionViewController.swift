@@ -244,6 +244,11 @@ extension SBPhotoCollectionViewController: UICollectionViewDataSource,SBPhotoCol
     /// - Parameter index: index
     func reloadIndexAfterMethod(index:Int){
         
+        if self.selectedAsset.count - index == 0 {
+            
+            return
+        }
+        
         var indexPaths = [IndexPath]()
         
         for asset in self.selectedAsset[index...(self.selectedAsset.count-1)]{
