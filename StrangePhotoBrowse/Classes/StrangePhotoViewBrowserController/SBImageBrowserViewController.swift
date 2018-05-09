@@ -17,26 +17,43 @@ extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
-        return SBImageBrowserViewControllerDismissedAnimatedTransitioning()
+        return dismissedAnimatedTransitioning
     }
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
-        return SBImageBrowserViewControllerPresentedAnimatedTransitioning()
+        return presentedAnimatedTransitioning
+    }
+    
+//    func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+//
+//    }
+    
+    func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
+        
+        if dismissedAnimatedTransitioning.isDismissInteractive{
+            
+            return dismissedAnimatedTransitioning
+        }
+        
+        return nil
     }
 }
 
 class SBImageBrowserViewController: UIPageViewController{
     
+    var dismissedAnimatedTransitioning = SBImageBrowserViewControllerDismissedAnimatedTransitioning()
+    var presentedAnimatedTransitioning = SBImageBrowserViewControllerPresentedAnimatedTransitioning()
+    
     private let viewController: StrangePhotoViewController
     
     /// ViewController 上方的View
-    private let topLayoutView = UIView()
-    private let navgationBarView = SBPhotoCollectionNavBarView()
+    let topLayoutView = UIView()
+    let navgationBarView = SBPhotoCollectionNavBarView()
     
     /// ViewController 下方的View
-    private let toolBarView = SBPhotoCollectionToolBarView()
-    private let bottomLayoutView = UIView()
+    let toolBarView = SBPhotoCollectionToolBarView()
+    let bottomLayoutView = UIView()
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     init(viewController: StrangePhotoViewController,currentIndex:Int) {
@@ -51,6 +68,7 @@ class SBImageBrowserViewController: UIPageViewController{
         self.transitioningDelegate = self
         
         self.dataSource = self
+        self.delegate = self
         
         let viewController = SBImageViewController(asset: self.viewController.fetchResult.object(at: currentIndex), viewController: self)
         viewController.indexPage = currentIndex
@@ -67,7 +85,6 @@ class SBImageBrowserViewController: UIPageViewController{
         
         super.viewDidLoad()
         
-        
         self.view.backgroundColor = UIColor.white
         
         self.makeTopNavView()
@@ -75,7 +92,7 @@ class SBImageBrowserViewController: UIPageViewController{
     }
 }
 
-extension SBImageBrowserViewController: UIPageViewControllerDataSource{
+extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageViewControllerDelegate{
     
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
         
@@ -106,6 +123,21 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource{
         
         return toViewController
     }
+    
+    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
+        
+        didChangeViewControllerItem()
+    }
+    
+    func didChangeViewControllerItem()  {
+        
+        guard let currentViewController = self.viewControllers?.first as? SBImageViewController else { return }
+        
+        let indexPath = IndexPath(item: currentViewController.indexPage, section: 0)
+        if !self.viewController.collectionView.indexPathsForVisibleItems.contains(indexPath) {
+            viewController.collectionView.scrollToItem(at: indexPath, at: UICollectionViewScrollPosition.centeredVertically, animated: false)
+        }
+    }
 }
 
 
@@ -113,8 +145,6 @@ extension SBImageBrowserViewController{
     
     /// 制作上方的 视图
     private func makeTopNavView() {
-        
-        navgationBarView.titleLabel.attributedText = "照片".withFont(UIFont.boldSystemFont(ofSize: 17)).withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor)
         
         topLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         navgationBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
@@ -165,11 +195,11 @@ extension SBImageBrowserViewController{
     }
     
     /// 处理单次 点击 视图
-    func handleSingleTapAction()  {
+    func handleSingleTapAction(_ foreceHidden:Bool=false)  {
         
         UIView.animate(withDuration: 0.3) {
             
-            if self.navgationBarView.transform == .identity {
+            if foreceHidden || self.navgationBarView.transform == .identity {
                 
                 self.view.backgroundColor = UIColor.black
                 

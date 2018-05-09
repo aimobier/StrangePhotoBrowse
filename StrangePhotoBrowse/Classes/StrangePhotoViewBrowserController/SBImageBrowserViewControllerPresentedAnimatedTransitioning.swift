@@ -54,7 +54,10 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
 }
 
 
-class SBImageBrowserViewControllerDismissedAnimatedTransitioning: NSObject,UIViewControllerAnimatedTransitioning {
+class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrivenInteractiveTransition,UIViewControllerAnimatedTransitioning {
+    
+    
+    //////////// UIViewControllerAnimatedTransitioning
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         
@@ -72,38 +75,204 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: NSObject,UIVie
         
         let indexPath = IndexPath(item: fromSubViewController.indexPage, section: 0)
         
-        if !toViewController.collectionView.indexPathsForVisibleItems.contains(indexPath) {
-            toViewController.collectionView.scrollToItem(at: indexPath, at: UICollectionViewScrollPosition.centeredVertically, animated: false)
+        guard let cell = toViewController.collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell else{
+            return transitionContext.completeTransition(true)
         }
         
-        DispatchQueue.main.async {
+        cell.imageView.isHidden = true
+        
+        let toMode = cell.imageView.contentMode
+        let toRect = toViewController.view.convert(cell.frame, from: toViewController.collectionView)
+        
+        fromSubViewController.imageView.contentMode = toMode
+        
+        UIView.animate(withDuration: self.transitionDuration(using: transitionContext)) {
             
-            guard let cell = toViewController.collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell else{
-                return transitionContext.completeTransition(true)
-            }
+            fromViewController.view.backgroundColor = fromViewController.view.backgroundColor?.a0
+        }
+        
+        UIView.animate(withDuration: self.transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
             
-            cell.imageView.isHidden = true
+            fromSubViewController.imageView.frame = toRect
             
-            let toMode = cell.imageView.contentMode
-            let toRect = toViewController.view.convert(cell.frame, from: toViewController.collectionView)
+        }) { (_) in
             
-            fromSubViewController.imageView.contentMode = toMode
+            cell.imageView.isHidden = false
             
-            UIView.animate(withDuration: self.transitionDuration(using: transitionContext)) {
-                
-                fromViewController.view.backgroundColor = fromViewController.view.backgroundColor?.a0
-            }
-            
-            UIView.animate(withDuration: self.transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
-                
-                fromSubViewController.imageView.frame = toRect
-                
-            }) { (_) in
-                
-                cell.imageView.isHidden = false
-                
-                transitionContext.completeTransition(true)
-            }
+            transitionContext.completeTransition(true)
         }
     }
+    
+    ///////////// UIPercentDrivenInteractiveTransition
+    
+    var isDismissInteractive = false
+    
+    var scale:CGFloat = 1
+    var rotation:CGFloat = 0
+    var currentImageCenterPoint = CGPoint.zero
+    
+    private var containerView:UIView!
+    private var transitionContext: UIViewControllerContextTransitioning!
+    
+    private var toViewController:StrangePhotoViewController!
+    private var fromViewController:SBImageBrowserViewController!
+    private var fromSubViewController:SBImageViewController!
+    
+    private var toCell:SBPhotoCollectionViewCell!
+    
+    private var fromViewFrame:CGRect!
+    
+    /// 该值为true时，才会进行来源页面的上下视图隐藏动画
+    private var animateToHiddenTopAndBottomView = false
+    
+    override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
+        
+        guard let toViewController = transitionContext.viewController(forKey: .to) as? StrangePhotoViewController,
+            let fromViewController = transitionContext.viewController(forKey: .from) as? SBImageBrowserViewController,
+            let fromSubViewController = fromViewController.viewControllers?.first as? SBImageViewController
+            else {
+                return transitionContext.completeTransition(true)
+        }
+        
+        self.transitionContext = transitionContext
+        
+        self.containerView = transitionContext.containerView
+        self.toViewController = toViewController
+        self.fromViewController = fromViewController
+        self.fromSubViewController = fromSubViewController
+        
+        let indexPath = IndexPath(item: fromSubViewController.indexPage, section: 0)
+        
+        guard let cell = toViewController.collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell else{
+            return transitionContext.completeTransition(true)
+        }
+        
+        toCell = cell
+        toCell.isHidden = true
+        
+        fromViewFrame = fromSubViewController.imageView.frame
+        animateToHiddenTopAndBottomView = fromViewController.navgationBarView.transform == .identity
+    }
+    
+    @discardableResult
+    func updatePanParam(_ center:CGPoint?=nil,scale:CGFloat?=nil,rotation:CGFloat?=nil) -> SBImageBrowserViewControllerDismissedAnimatedTransitioning {
+        if let r = rotation {
+            self.rotation = r
+        }
+        
+        if let s = scale {
+            self.scale = s
+        }
+        
+        if let p = center {
+            self.currentImageCenterPoint = p
+        }
+        return self
+    }
+    
+    override func update(_ percentComplete: CGFloat) {
+        
+        let progress = max(0, min(percentComplete, 1))
+        
+        if fromSubViewController == nil { return }
+        
+        fromSubViewController.imageView.center = currentImageCenterPoint
+        fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
+        fromSubViewController.imageView.transform = fromSubViewController.imageView.transform.rotated(by: rotation)
+        
+        makeProgress(progress: progress)
+    }
+    
+    override func cancel() {
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
+            
+            self.makeProgress(progress: 0)
+        }
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+            
+//            self.fromSubViewController.scrollView.zoomScale = 1
+//            self.fromSubViewController.imageView.frame.size = self.fromViewFrame.size
+            self.fromSubViewController.imageView.center = self.fromSubViewController.startImagePoint
+            self.fromSubViewController.imageView.transform = .identity
+            
+            self.fromSubViewController.scrollView.layoutSubviews()
+            
+        }) { (_) in
+            
+            self.toCell.isHidden = false
+            
+            self.transitionContext.completeTransition(false)
+        }
+    }
+    
+    override func finish() {
+
+        let toMode = toCell.imageView.contentMode
+        let toRect = toViewController.view.convert(toCell.frame, from: toViewController.collectionView)
+        
+        fromSubViewController.imageView.contentMode = toMode
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
+            
+            self.makeProgress(progress: 1)
+        }
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+            
+            self.fromSubViewController.imageView.transform = .identity
+            self.fromSubViewController.imageView.frame = toRect
+            
+        }) { (_) in
+            
+            self.toCell.isHidden = false
+            
+            self.transitionContext.completeTransition(true)
+        }
+    }
+
+    private func makeProgress(progress:CGFloat){
+        
+        fromViewController.view.backgroundColor =  fromViewController.view.backgroundColor?.withAlphaComponent(1-progress) ?? .white
+        
+        if animateToHiddenTopAndBottomView {
+            
+            fromViewController.topLayoutView.alpha = 1-progress
+            fromViewController.navgationBarView.alpha = 1-progress
+            
+            fromViewController.bottomLayoutView.alpha = 1-progress
+            fromViewController.toolBarView.alpha = 1-progress
+        }
+        
+        toViewController.topLayoutView.alpha = progress
+        toViewController.navgationBarView.alpha = progress
+        
+        toViewController.bottomLayoutView.alpha = progress
+        toViewController.toolBarView.alpha = progress
+    }
+    
+//    private func makeProgress(progress:CGFloat){
+//
+//        self.fromViewController.view.backgroundColor =  self.fromViewController.view.backgroundColor?.withAlphaComponent(1-progress) ?? .white
+//
+//        if animateToHiddenTopAndBottomView {
+//
+//            fromViewController.topLayoutView.transform = CGAffineTransform(translationX: 0, y: -fromViewController.topLayoutView.frame.height*progress)
+//            fromViewController.navgationBarView.transform = CGAffineTransform(translationX: 0, y: (-fromViewController.navgationBarView.frame.height-fromViewController.topLayoutView.frame.height)*progress)
+//
+//            fromViewController.bottomLayoutView.transform = CGAffineTransform(translationX: 0, y: fromViewController.bottomLayoutView.frame.height*progress)
+//            fromViewController.toolBarView.transform = CGAffineTransform(translationX: 0, y: (fromViewController.toolBarView.frame.height+fromViewController.bottomLayoutView.frame.height)*progress)
+//        }
+//
+//        let cprogress = 1-progress
+//
+//        toViewController.topLayoutView.transform = CGAffineTransform(translationX: 0, y: -toViewController.topLayoutView.frame.height*cprogress)
+//        toViewController.navgationBarView.transform = CGAffineTransform(translationX: 0, y: (-toViewController.navgationBarView.frame.height-fromViewController.topLayoutView.frame.height)*cprogress)
+//
+//        print(toViewController.bottomLayoutView.frame.height*cprogress,"---",(toViewController.toolBarView.frame.height+toViewController.bottomLayoutView.frame.height)*cprogress)
+//
+//        toViewController.bottomLayoutView.transform = CGAffineTransform(translationX: 0, y: toViewController.bottomLayoutView.frame.height*cprogress)
+//        toViewController.toolBarView.transform = CGAffineTransform(translationX: 0, y: (toViewController.toolBarView.frame.height+toViewController.bottomLayoutView.frame.height)*cprogress)
+//    }
 }

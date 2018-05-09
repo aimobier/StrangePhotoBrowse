@@ -13,7 +13,7 @@ class SBImageViewController: UIViewController {
     
     var indexPage = 0
     
-    private let item:PHAsset
+    let item:PHAsset
     private let viewController: SBImageBrowserViewController
     
     let scrollView = UIScrollView()
@@ -22,6 +22,14 @@ class SBImageViewController: UIViewController {
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
+    
+    //// DISMISSED NEED PROTI
+    private var pan:UIPanGestureRecognizer!
+    private var pinch:UIPinchGestureRecognizer!
+    private var rotation:UIRotationGestureRecognizer!
+    
+    private var startPoint = CGPoint.zero
+    var startImagePoint = CGPoint.zero
     
     init(asset:PHAsset,viewController: SBImageBrowserViewController){
         
@@ -51,8 +59,21 @@ class SBImageViewController: UIViewController {
         
         let imageTap = UITapGestureRecognizer(target: self, action: #selector(handleImageTap(gesture:)))
         self.view.addGestureRecognizer(imageTap)
-        
         imageTap.require(toFail: doubleTap)
+        
+        pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(gesture:)))
+        pan.maximumNumberOfTouches = 1
+        pan.delaysTouchesBegan = true
+        pan.delegate = self
+        imageView.addGestureRecognizer(pan)
+        
+        pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(gesture:)))
+        pinch.delegate = self
+        scrollView.addGestureRecognizer(pinch)
+        
+        rotation = UIRotationGestureRecognizer(target: self, action: #selector(handleRotation(gesture:)))
+        rotation.delegate = self
+        scrollView.addGestureRecognizer(rotation)
     }
     
     override func viewDidLoad() {
@@ -62,8 +83,6 @@ class SBImageViewController: UIViewController {
         PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: nil) {[weak self] (image, _) in
             
             self?.imageView.image = image
-            
-//            self?.calculationMaximumZoomScale()
         }
     }
 }
@@ -81,36 +100,99 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
         let xsize = scrollView.bounds.size.width / newZoomScale
         let ysize = scrollView.bounds.size.height / newZoomScale
         scrollView.zoom(to: CGRect(x: touchPoint.x - xsize/2, y: touchPoint.y - ysize/2, width: xsize, height: ysize), animated: true)
+        
+        self.viewController.handleSingleTapAction(true)
     }
     
     @objc func handleImageTap(gesture: UITapGestureRecognizer){
         
-        self.dismiss(animated: true, completion: nil)
-        
-//        self.viewController.handleSingleTapAction()
+        self.viewController.handleSingleTapAction()
     }
     
-    private func calculationMaximumZoomScale(){
+    @objc func handlePan(gesture: UIPanGestureRecognizer){
         
-        guard let image = self.imageView.image else{ return }
-        
-        let imageSize = image.size;
-        let boundsSize = self.scrollView.bounds.size;
-        
-        let imageAspectRate = imageSize.width/imageSize.height
-        let viewAspectRate = boundsSize.width/boundsSize.height
-        
-        if imageAspectRate > viewAspectRate {
+        switch gesture.state {
+        case .began:
+            self.startPoint = gesture.location(in: self.view)
+            self.startImagePoint = imageView.center
+            self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = true
+            self.dismiss(animated: true, completion: nil)
+        case .changed:
+            let progressY = self.startImagePoint.y + gesture.translation(in: gesture.view).y.realValue
+            let progressX = self.startImagePoint.x + gesture.translation(in: gesture.view).x.realValue
+            let progress = (gesture.location(in: self.view).y-startPoint.y)/(self.imageView.frame.height/2)
+            self.viewController.dismissedAnimatedTransitioning.updatePanParam(CGPoint(x: progressX, y: progressY)).update(progress)
+        default:
             
-            scrollView.maximumZoomScale = imageSize.width / boundsSize.width
-        }else{
-            scrollView.maximumZoomScale = imageSize.height / boundsSize.height
+            let progress = max(min(0.99, (gesture.location(in: self.view).y-startPoint.y)/(self.imageView.frame.height/2)), 0)
+            
+            if progress >= 0.5 || gesture.velocity(in: self.view).y > 800{
+                
+                self.viewController.dismissedAnimatedTransitioning.finish()
+            }else{
+                self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = false
+                self.viewController.dismissedAnimatedTransitioning.cancel()
+            }
+        }
+    }
+    
+    @objc func handlePinch(gesture:UIPinchGestureRecognizer){
+        
+        switch gesture.state {
+        case .began:
+            self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = true
+            self.dismiss(animated: true, completion: nil)
+            self.pinch.cancelsTouchesInView = true
+            self.startImagePoint = imageView.center
+        case .changed: self.viewController.dismissedAnimatedTransitioning.updatePanParam(gesture.location(in: self.view),scale: gesture.scale).update(1-gesture.scale)
+        default:
+            if gesture.scale <= 0.65 || gesture.velocity <= -5{
+                self.viewController.dismissedAnimatedTransitioning.finish()
+            }else{
+                self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = false
+                self.viewController.dismissedAnimatedTransitioning.cancel()
+            }
+        }
+    }
+    
+    @objc func handleRotation(gesture:UIRotationGestureRecognizer){
+        
+        if !self.viewController.dismissedAnimatedTransitioning.isDismissInteractive { return }
+        
+        self.viewController.dismissedAnimatedTransitioning.updatePanParam(rotation: gesture.rotation)
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if self.pan == gestureRecognizer {
+            return true
+        }
+        return false
+    }
+
+    
+    func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if gestureRecognizer == self.pan {
+            let translation = self.pan.translation(in: self.pan.view)
+            return translation.y > 0 && abs(translation.x) < abs(translation.y)
         }
         
-        if imageSize.width < boundsSize.width*3 && imageSize.height < boundsSize.height*3 {
-            
-            scrollView.maximumZoomScale = 3
+        if gestureRecognizer == self.pinch  {
+            return self.pinch.scale < 1 && self.scrollView.zoomScale == 1
         }
+        
+        return true
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        
+        if (gestureRecognizer == self.rotation && otherGestureRecognizer == self.pinch){
+        
+            return true
+        }
+        
+        return true
     }
 }
 

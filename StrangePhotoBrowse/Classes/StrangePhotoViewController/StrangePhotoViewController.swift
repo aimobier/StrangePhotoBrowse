@@ -20,12 +20,12 @@ private extension UICollectionView {
 public class StrangePhotoViewController: UIViewController{
     
     /// ViewController 上方的View
-    private let topLayoutView = UIView()
-    private let navgationBarView = SBPhotoCollectionNavBarView()
+    let topLayoutView = UIView()
+    let navgationBarView = SBPhotoCollectionNavBarView()
     
     /// ViewController 下方的View
-    private let toolBarView = SBPhotoCollectionToolBarView()
-    private let bottomLayoutView = UIView()
+    let toolBarView = SBPhotoCollectionToolBarView()
+    let bottomLayoutView = UIView()
     
     /// 默认的 collectionView FlowLayout
     

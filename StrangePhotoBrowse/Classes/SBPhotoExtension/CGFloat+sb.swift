@@ -11,4 +11,10 @@ extension CGFloat{
     var i:Int { return Int(self) }
     var s:String { return "\(self)" }
     var d:Double { return Double(self) }
+    var realValue:CGFloat{
+        if self.isNaN {
+            return 0
+        }
+        return self
+    }
 }
