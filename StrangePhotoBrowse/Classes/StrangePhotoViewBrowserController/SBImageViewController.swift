@@ -142,7 +142,7 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
         case .began:
             self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = true
             self.dismiss(animated: true, completion: nil)
-            self.pinch.cancelsTouchesInView = true
+//            self.pinch.cancelsTouchesInView = true
             self.startImagePoint = imageView.center
         case .changed: self.viewController.dismissedAnimatedTransitioning.updatePanParam(gesture.location(in: self.view),scale: gesture.scale).update(1-gesture.scale)
         default:

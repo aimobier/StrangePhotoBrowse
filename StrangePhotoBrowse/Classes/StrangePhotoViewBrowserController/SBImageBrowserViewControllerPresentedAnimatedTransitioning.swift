@@ -120,8 +120,6 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     private var toCell:SBPhotoCollectionViewCell!
     
-    private var fromViewFrame:CGRect!
-    
     /// 该值为true时，才会进行来源页面的上下视图隐藏动画
     private var animateToHiddenTopAndBottomView = false
     
@@ -150,8 +148,11 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         toCell = cell
         toCell.isHidden = true
         
-        fromViewFrame = fromSubViewController.imageView.frame
         animateToHiddenTopAndBottomView = fromViewController.navgationBarView.transform == .identity
+        
+        scale = 1
+        rotation = 0
+        currentImageCenterPoint = .zero
     }
     
     @discardableResult
@@ -177,7 +178,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         if fromSubViewController == nil { return }
         
         fromSubViewController.imageView.center = currentImageCenterPoint
-        fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
+//        fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
         fromSubViewController.imageView.transform = fromSubViewController.imageView.transform.rotated(by: rotation)
         
         makeProgress(progress: progress)
@@ -190,15 +191,10 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             self.makeProgress(progress: 0)
         }
         
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
+        UIView.animate(withDuration: self.transitionDuration(using: self.transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
             
-//            self.fromSubViewController.scrollView.zoomScale = 1
-//            self.fromSubViewController.imageView.frame.size = self.fromViewFrame.size
-            self.fromSubViewController.imageView.center = self.fromSubViewController.startImagePoint
             self.fromSubViewController.imageView.transform = .identity
-            
-            self.fromSubViewController.scrollView.layoutSubviews()
-            
+            self.fromSubViewController.imageView.center = self.fromSubViewController.startImagePoint
         }) { (_) in
             
             self.toCell.isHidden = false
