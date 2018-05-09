@@ -40,7 +40,7 @@ class SBImageBrowserViewController: UIPageViewController{
     
     /// ViewController 上方的View
     let topLayoutView = UIView()
-    let navgationBarView = SBPhotoCollectionNavBarView()
+    let navgationBarView = SBPhotoCollectionNavBarView(style: .cancel)
     
     /// ViewController 下方的View
     let toolBarView = SBPhotoCollectionToolBarView()
@@ -152,7 +152,7 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
 }
 
 
-extension SBImageBrowserViewController{
+extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
     
     /// 制作上方的 视图
     private func makeTopNavView() {
@@ -161,6 +161,7 @@ extension SBImageBrowserViewController{
         navgationBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
         view.addSubview(navgationBarView)
+        navgationBarView.delegate = self
         navgationBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addConstraints([
             NSLayoutConstraint(item: navgationBarView, attribute: .top, relatedBy: .equal, toItem: topLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0),
@@ -237,5 +238,10 @@ extension SBImageBrowserViewController{
                 self.sbIsStatusBarHidden = false
             }
         }
+    }
+    
+    func didClickCancelButton(button: UIButton) {
+        
+        self.dismiss(animated: true, completion: nil)
     }
 }

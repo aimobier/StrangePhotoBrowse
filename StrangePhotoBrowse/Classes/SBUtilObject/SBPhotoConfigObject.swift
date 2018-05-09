@@ -48,4 +48,7 @@ public class SBPhotoConfigObject {
     
     /// 是否在首页 UICollectionView 页面增加 Gif 支持
     public var showGifInCollectionMainView = false
+    
+    /// IOS11 -> 全面屏 会默认的上下留空，设置该属性为true则可以不留空
+    public var previewViewControllerTopBottomSpaceZero = false
 }

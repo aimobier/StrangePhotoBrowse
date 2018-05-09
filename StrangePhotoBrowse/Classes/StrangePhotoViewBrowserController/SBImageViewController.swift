@@ -38,12 +38,19 @@ class SBImageViewController: UIViewController {
         
         super.init(nibName: nil, bundle: nil)
         
+        if SBPhotoConfigObject.share.previewViewControllerTopBottomSpaceZero , #available(iOS 11.0, *) {
+            scrollView.contentInsetAdjustmentBehavior = .never
+        }
+        
         scrollView.frame = self.view.bounds
         scrollView.autoresizingMask = [.flexibleWidth,.flexibleHeight,.flexibleTopMargin,.flexibleRightMargin,.flexibleLeftMargin,.flexibleBottomMargin]
         scrollView.maximumZoomScale = 3
         scrollView.minimumZoomScale = 1
         scrollView.delegate = self
         scrollView.isUserInteractionEnabled = true
+        scrollView.contentInset = .zero
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
         view.addSubview(scrollView)
         
         imageView.frame = scrollView.bounds

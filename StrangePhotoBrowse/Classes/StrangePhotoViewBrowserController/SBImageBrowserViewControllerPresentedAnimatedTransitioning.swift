@@ -86,6 +86,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         
         fromSubViewController.imageView.contentMode = toMode
         
+        transitionContext.containerView.insertSubview(toViewController.view, at: 0)
+        
         UIView.animate(withDuration: self.transitionDuration(using: transitionContext)) {
             
             fromViewController.view.backgroundColor = fromViewController.view.backgroundColor?.a0
