@@ -7,6 +7,7 @@
 
 import UIKit
 import Photos
+import FLAnimatedImage
 
 class SBPhotoChoiceCollectionViewControllerPresentedAnimatedTransitioning:NSObject, UIViewControllerAnimatedTransitioning{
     
@@ -287,6 +288,14 @@ extension SBPhotoChoiceCollectionViewController: UITableViewDataSource{
                 cell.imageView1.image = images?[safe: 0]
                 cell.imageView2.image = images?[safe: 1]
                 cell.imageView3.image = images?[safe: 2]
+                
+                if SBPhotoConfigObject.share.showGifInCollectionMainView,let asset = basicData.fetchResults?.firstObject ,asset.isGif{
+                    
+                    PHImageManager.default().requestImageData(for: asset, options: nil) { (data, _, _, _) in
+                        guard let ndata = data else { return }
+                        cell.imageView1.animatedImage = FLAnimatedImage(animatedGIFData: ndata)
+                    }
+                }
             }
         }
         

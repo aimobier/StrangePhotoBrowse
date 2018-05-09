@@ -7,7 +7,7 @@
 
 import UIKit
 import Photos
-
+import FLAnimatedImage
 
 class SBImageViewController: UIViewController {
     
@@ -17,7 +17,7 @@ class SBImageViewController: UIViewController {
     private let viewController: SBImageBrowserViewController
     
     let scrollView = UIScrollView()
-    let imageView = UIImageView()
+    let imageView = FLAnimatedImageView()
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
@@ -80,9 +80,20 @@ class SBImageViewController: UIViewController {
         
         super.viewDidLoad()
         
-        PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: nil) {[weak self] (image, _) in
+        if self.item.isGif {
             
-            self?.imageView.image = image
+            PHImageManager.default().requestImageData(for: item, options: nil) { (data, _, _, _) in
+                
+                guard let ndata = data else { return }
+                
+                self.imageView.animatedImage = FLAnimatedImage(animatedGIFData: ndata)
+            }
+        }else{
+            
+            PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: nil) {[weak self] (image, _) in
+                
+                self?.imageView.image = image
+            }
         }
         
         self.viewController.sbStatusBarStyle = SBPhotoConfigObject.share.statusStyle

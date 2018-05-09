@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import FLAnimatedImage
 
 class SBPhotoChoiceTableViewCell: UITableViewCell {
     
     private let PICHEIGHT = 66.f
     
     /// 图片集合
-    let imageView1 = UIImageView()
+    let imageView1 = FLAnimatedImageView()
     let imageView2 = UIImageView()
     let imageView3 = UIImageView()
     

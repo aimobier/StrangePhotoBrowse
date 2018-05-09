@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FLAnimatedImage
 
 protocol SBPhotoCollectionViewCellDelegate {
     
@@ -17,7 +18,7 @@ protocol SBPhotoCollectionViewCellDelegate {
 
 class SBPhotoCollectionViewCell: UICollectionViewCell {
     
-    let imageView = UIImageView()
+    let imageView = FLAnimatedImageView()
     
     let selectButton = SBPhotoCollectionButton(type: .system)
     

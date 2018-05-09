@@ -12,6 +12,9 @@ public class SBPhotoConfigObject {
     /// 默认的
     public static let share = SBPhotoConfigObject()
     
+    /// UIViewControllerBasedStatusBarAppearance - View controller-based status bar appearance
+    public let BaseStatusBarViewController:Bool = Bundle.main.object(forInfoDictionaryKey: "UIViewControllerBasedStatusBarAppearance") as? Bool ?? true
+    
     /// 主题色
     public var mainColor = UIColor(rgb: 0x3979e6)
     
@@ -43,6 +46,6 @@ public class SBPhotoConfigObject {
     /// 默认的 lightContent
     public var statusStyle:UIStatusBarStyle = .lightContent
     
-    /// UIViewControllerBasedStatusBarAppearance - View controller-based status bar appearance
-    public let BaseStatusBarViewController:Bool = Bundle.main.object(forInfoDictionaryKey: "UIViewControllerBasedStatusBarAppearance") as? Bool ?? true
+    /// 是否在首页 UICollectionView 页面增加 Gif 支持
+    public var showGifInCollectionMainView = false
 }

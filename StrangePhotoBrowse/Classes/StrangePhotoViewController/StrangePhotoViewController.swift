@@ -6,6 +6,7 @@
 //
 
 import Photos
+import FLAnimatedImage
 
 fileprivate let SCREENWIDTH = UIScreen.main.bounds.width
 fileprivate let SCREENHEIGHT = UIScreen.main.bounds.height
@@ -209,13 +210,18 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         cell.selectButton.sb_setSelected(index: self.selectedAsset.index(of: asset))
         
         cell.representedAssetIdentifier = asset.localIdentifier
-        imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
-            // The cell may have been recycled by the time this handler gets called;
-            // set the cell's thumbnail image only if it's still showing the same asset.
-            if cell.representedAssetIdentifier == asset.localIdentifier {
-                cell.thumbnailImage = image
+        if asset.isGif && SBPhotoConfigObject.share.showGifInCollectionMainView {
+            imageManager.requestImageData(for: asset, options: nil) { (data, _, _, _) in
+                guard let ndata = data,cell.representedAssetIdentifier == asset.localIdentifier else { return }
+                cell.imageView.animatedImage = FLAnimatedImage(animatedGIFData: ndata)
             }
-        })
+        }else{
+            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                    cell.thumbnailImage = image
+                }
+            })
+        }
         
         return cell
     }
