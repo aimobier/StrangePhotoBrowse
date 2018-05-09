@@ -1,15 +1,22 @@
 PODS:
-  - StrangePhotoBrowse (0.1.0)
+  - FLAnimatedImage (1.0.12)
+  - StrangePhotoBrowse (0.1.0):
+    - FLAnimatedImage (~> 1.0)
 
 DEPENDENCIES:
   - StrangePhotoBrowse (from `../`)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - FLAnimatedImage
 
 EXTERNAL SOURCES:
   StrangePhotoBrowse:
     :path: "../"
 
 SPEC CHECKSUMS:
-  StrangePhotoBrowse: 63abe78c3f4753c1da309cd9e456024db04ef512
+  FLAnimatedImage: 4a0b56255d9b05f18b6dd7ee06871be5d3b89e31
+  StrangePhotoBrowse: 6822188d27b5d68a677d97e3bab430852156912c
 
 PODFILE CHECKSUM: d8a2e5bfe460437711b42d2f0c701d6616ac660b
 

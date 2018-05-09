@@ -61,7 +61,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         
-        return 0.5
+        return 0.7
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
@@ -123,8 +123,11 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     /// 该值为true时，才会进行来源页面的上下视图隐藏动画
     private var animateToHiddenTopAndBottomView = false
     
+    //// 是不是 滑动手势触发的该对象
+    var isPan = false
+    
+    /// 记录进来页面时的 StatusBar 是否隐藏情况
     private var isHiddenStatusBar = false
-    private var statusBarStyle:UIStatusBarStyle = .lightContent
     
     override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         
@@ -141,6 +144,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         self.toViewController = toViewController
         self.fromViewController = fromViewController
         self.fromSubViewController = fromSubViewController
+        
+        transitionContext.containerView.insertSubview(toViewController.view, at: 0)
         
         let indexPath = IndexPath(item: fromSubViewController.indexPage, section: 0)
         
@@ -186,8 +191,13 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         
         if fromSubViewController == nil { return }
         
+        if isPan {
+            fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale-(0.2*progress), y: scale-(0.2*progress))
+        }else{
+            fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
+        }
+        
         fromSubViewController.imageView.center = currentImageCenterPoint
-//        fromSubViewController.imageView.transform = CGAffineTransform(scaleX: scale, y: scale)
         fromSubViewController.imageView.transform = fromSubViewController.imageView.transform.rotated(by: rotation)
         
         makeProgress(progress: progress)
@@ -222,10 +232,9 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         let toMode = toCell.imageView.contentMode
         let toRect = toViewController.view.convert(toCell.frame, from: toViewController.collectionView)
         
-        fromSubViewController.imageView.contentMode = toMode
-        
         UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
             
+            self.fromSubViewController.imageView.contentMode = toMode
             self.makeProgress(progress: 1)
         }
         
@@ -261,28 +270,4 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         toViewController.bottomLayoutView.alpha = progress
         toViewController.toolBarView.alpha = progress
     }
-    
-//    private func makeProgress(progress:CGFloat){
-//
-//        self.fromViewController.view.backgroundColor =  self.fromViewController.view.backgroundColor?.withAlphaComponent(1-progress) ?? .white
-//
-//        if animateToHiddenTopAndBottomView {
-//
-//            fromViewController.topLayoutView.transform = CGAffineTransform(translationX: 0, y: -fromViewController.topLayoutView.frame.height*progress)
-//            fromViewController.navgationBarView.transform = CGAffineTransform(translationX: 0, y: (-fromViewController.navgationBarView.frame.height-fromViewController.topLayoutView.frame.height)*progress)
-//
-//            fromViewController.bottomLayoutView.transform = CGAffineTransform(translationX: 0, y: fromViewController.bottomLayoutView.frame.height*progress)
-//            fromViewController.toolBarView.transform = CGAffineTransform(translationX: 0, y: (fromViewController.toolBarView.frame.height+fromViewController.bottomLayoutView.frame.height)*progress)
-//        }
-//
-//        let cprogress = 1-progress
-//
-//        toViewController.topLayoutView.transform = CGAffineTransform(translationX: 0, y: -toViewController.topLayoutView.frame.height*cprogress)
-//        toViewController.navgationBarView.transform = CGAffineTransform(translationX: 0, y: (-toViewController.navgationBarView.frame.height-fromViewController.topLayoutView.frame.height)*cprogress)
-//
-//        print(toViewController.bottomLayoutView.frame.height*cprogress,"---",(toViewController.toolBarView.frame.height+toViewController.bottomLayoutView.frame.height)*cprogress)
-//
-//        toViewController.bottomLayoutView.transform = CGAffineTransform(translationX: 0, y: toViewController.bottomLayoutView.frame.height*cprogress)
-//        toViewController.toolBarView.transform = CGAffineTransform(translationX: 0, y: (toViewController.toolBarView.frame.height+toViewController.bottomLayoutView.frame.height)*cprogress)
-//    }
 }

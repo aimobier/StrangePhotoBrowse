@@ -55,7 +55,7 @@ class SBImageBrowserViewController: UIPageViewController{
             UIPageViewControllerOptionInterPageSpacingKey: SBPhotoConfigObject.share.pageViewControllerOptionInterPageSpace
             ])
         
-        self.modalPresentationStyle = .custom
+//        self.modalPresentationStyle = .custom
         self.transitioningDelegate = self
         
         self.dataSource = self

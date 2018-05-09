@@ -10,10 +10,16 @@ import MobileCoreServices
 
 extension PHAsset{
     
+    /// 是否为 gif
     var isGif:Bool{
         if let identifier = self.value(forKey: "uniformTypeIdentifier") as? String,identifier == kUTTypeGIF as String{
             return true
         }
         return false
+    }
+    
+    /// 是否为视频
+    var isVideo:Bool{
+        return self.mediaType == .video
     }
 }

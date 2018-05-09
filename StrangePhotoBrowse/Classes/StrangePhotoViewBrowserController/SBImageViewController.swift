@@ -46,7 +46,7 @@ class SBImageViewController: UIViewController {
         scrollView.isUserInteractionEnabled = true
         view.addSubview(scrollView)
         
-        imageView.frame = self.view.bounds
+        imageView.frame = scrollView.bounds
         imageView.autoresizingMask = [.flexibleWidth,.flexibleHeight,.flexibleTopMargin,.flexibleRightMargin,.flexibleLeftMargin,.flexibleBottomMargin]
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
@@ -98,9 +98,25 @@ class SBImageViewController: UIViewController {
         
         self.viewController.sbStatusBarStyle = SBPhotoConfigObject.share.statusStyle
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        
+        super.viewDidDisappear(animated)
+        
+        self.scrollView.setZoomScale(self.scrollView.minimumZoomScale, animated: true)
+    }
 }
 
 extension SBImageViewController: UIGestureRecognizerDelegate{
+    
+    func zoomRectForScrollViewWith(_ scale: CGFloat, touchPoint: CGPoint) -> CGRect {
+        let w = self.scrollView.frame.size.width / scale
+        let h = self.scrollView.frame.size.height / scale
+        let x = touchPoint.x - (h / max(UIScreen.main.scale, 2.0))
+        let y = touchPoint.y - (w / max(UIScreen.main.scale, 2.0))
+        
+        return CGRect(x: x, y: y, width: w, height: h)
+    }
     
     @objc func handleDoubleTap(gesture: UITapGestureRecognizer){
         
@@ -108,13 +124,32 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
             return self.scrollView.setZoomScale(1, animated: true)
         }
         
-        let touchPoint = gesture.location(in: imageView)
-        let newZoomScale = scrollView.maximumZoomScale
-        let xsize = scrollView.bounds.size.width / newZoomScale
-        let ysize = scrollView.bounds.size.height / newZoomScale
-        scrollView.zoom(to: CGRect(x: touchPoint.x - xsize/2, y: touchPoint.y - ysize/2, width: xsize, height: ysize), animated: true)
+        self.centerImageView()
+        
+        let touchPoint = gesture.location(in: self.imageView)
+        
+        scrollView.zoom(to: zoomRectForScrollView(scrollView: self.scrollView, scale: self.scrollView.maximumZoomScale, center: touchPoint), animated: true)
         
         self.viewController.handleSingleTapAction(true)
+    }
+    
+    func zoomRectForScrollView(scrollView:UIScrollView,scale:CGFloat,center:CGPoint) -> CGRect {
+        
+        var zoomRect = CGRect()
+        
+        // The zoom rect is in the content view's coordinates.
+        // At a zoom scale of 1.0, it would be the size of the
+        // imageScrollView's bounds.
+        // As the zoom scale decreases, so more content is visible,
+        // the size of the rect grows.
+        zoomRect.size.height = scrollView.frame.size.height / scale
+        zoomRect.size.width = scrollView.frame.size.width / scale
+        
+        // choose an origin so as to get the right center.
+        zoomRect.origin.x = center.x - zoomRect.width/2
+        zoomRect.origin.y = center.y - zoomRect.height/2
+        
+        return zoomRect
     }
     
     @objc func handleImageTap(gesture: UITapGestureRecognizer){
@@ -128,6 +163,7 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
         case .began:
             self.startPoint = gesture.location(in: self.view)
             self.startImagePoint = imageView.center
+            self.viewController.dismissedAnimatedTransitioning.isPan = true
             self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = true
             self.dismiss(animated: true, completion: nil)
         case .changed:
@@ -143,6 +179,7 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
                 
                 self.viewController.dismissedAnimatedTransitioning.finish()
             }else{
+                self.viewController.dismissedAnimatedTransitioning.isPan = false
                 self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = false
                 self.viewController.dismissedAnimatedTransitioning.cancel()
             }
@@ -155,7 +192,7 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
         case .began:
             self.viewController.dismissedAnimatedTransitioning.isDismissInteractive = true
             self.dismiss(animated: true, completion: nil)
-//            self.pinch.cancelsTouchesInView = true
+            self.pinch.cancelsTouchesInView = true
             self.startImagePoint = imageView.center
         case .changed: self.viewController.dismissedAnimatedTransitioning.updatePanParam(gesture.location(in: self.view),scale: gesture.scale).update(1-gesture.scale)
         default:
@@ -170,7 +207,7 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
     
     @objc func handleRotation(gesture:UIRotationGestureRecognizer){
         
-        if !self.viewController.dismissedAnimatedTransitioning.isDismissInteractive { return }
+        guard self.viewController.dismissedAnimatedTransitioning.isDismissInteractive else { return }
         
         self.viewController.dismissedAnimatedTransitioning.updatePanParam(rotation: gesture.rotation)
     }
@@ -186,21 +223,26 @@ extension SBImageViewController: UIGestureRecognizerDelegate{
     
     func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         
-        if gestureRecognizer == self.pan {
+        if gestureRecognizer == self.pan && self.scrollView.zoomScale <= self.scrollView.minimumZoomScale{
             let translation = self.pan.translation(in: self.pan.view)
             return translation.y > 0 && abs(translation.x) < abs(translation.y)
         }
         
         if gestureRecognizer == self.pinch  {
-            return self.pinch.scale < 1 && self.scrollView.zoomScale == 1
+            return self.pinch.scale < 1 && self.scrollView.zoomScale <= 1
         }
         
-        return true
+        if self.rotation == gestureRecognizer {
+            
+            return true
+        }
+        
+        return false
     }
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         
-        if (gestureRecognizer == self.rotation && otherGestureRecognizer == self.pinch){
+        if (gestureRecognizer == self.rotation && otherGestureRecognizer == self.pinch) || (gestureRecognizer == self.pinch && otherGestureRecognizer == self.rotation){
         
             return true
         }
@@ -236,13 +278,13 @@ extension SBImageViewController: UIScrollViewDelegate{
             var frameToCenter = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
             
             if frameToCenter.width < boundsSize.width {
-                frameToCenter.origin.x = (boundsSize.width - frame.width)/2
+                frameToCenter.origin.x = (boundsSize.width - frameToCenter.width)/2
             }else{
                 frameToCenter.origin.x = 0
             }
             
             if frameToCenter.height < boundsSize.height {
-                frameToCenter.origin.y = (boundsSize.height - frame.height)/2
+                frameToCenter.origin.y = (boundsSize.height - frameToCenter.height)/2
             }else{
                 frameToCenter.origin.y = 0
             }
