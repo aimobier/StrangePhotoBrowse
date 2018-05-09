@@ -154,7 +154,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     private func sortOptions() -> PHFetchOptions{
         
         let allPhotosOptions = PHFetchOptions()
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         return allPhotosOptions
     }
     

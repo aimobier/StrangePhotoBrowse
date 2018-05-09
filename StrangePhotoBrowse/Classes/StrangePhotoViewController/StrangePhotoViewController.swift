@@ -37,6 +37,9 @@ public class StrangePhotoViewController: UIViewController{
     var collectionView : UICollectionView!
     private let collectionViewFlowLayout = UICollectionViewFlowLayout()
     
+    /// 是否选择了原图
+    private var isOriginal = false
+    
     /// 当前视图的
     private let imageManager = PHCachingImageManager()
     private var assetCollection: PHAssetCollection?
@@ -45,7 +48,7 @@ public class StrangePhotoViewController: UIViewController{
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
         let allPhotosOptions = PHFetchOptions()
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         return PHAsset.fetchAssets(with: allPhotosOptions)
     }()
     
@@ -140,6 +143,8 @@ extension StrangePhotoViewController{
             NSLayoutConstraint(item: bottomLayoutView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: bottomLayoutView, attribute: .bottom, relatedBy: .equal, toItem: bottomLayoutGuide, attribute: .bottom, multiplier: 1, constant: 0),
             ])
+        
+        updateOriginalButton(button: toolBarView.originalButton)
         
         toolBarView.delegate = self
         view.addSubview(toolBarView)
@@ -410,6 +415,23 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate{
     
     func didClickOriginalButton(button: UIButton) {
         
+        self.isOriginal = !isOriginal
+        
+        if button == self.toolBarView.originalButton {
+            self.updateOriginalButton(button: button)
+        }else{
+            self.updateOriginalButton(button: button)
+            self.updateOriginalButton(button: self.toolBarView.originalButton)
+        }
+    }
+
+    func updateOriginalButton(button: UIButton){
+        if self.isOriginal {
+            button.setImage(SBPhotoConfigObject.share.pickerOriginalSelectImage, for: .normal)
+        }else{
+            button.setImage(SBPhotoConfigObject.share.pickerOriginalDefaultImage, for: .normal)
+        }
+        button.setAttributedTitle(button.attributedTitle(for: .normal), for: .normal)
     }
     
     func didClickChoiceButton(button: UIButton) {

@@ -40,10 +40,10 @@ class SBImageBrowserViewController: UIPageViewController{
     
     /// ViewController 上方的View
     let topLayoutView = UIView()
-    let navgationBarView = SBPhotoCollectionNavBarView(style: .cancel)
+    let navgationBarView = SBPhotoCollectionNavBarView(.cancel)
     
     /// ViewController 下方的View
-    let toolBarView = SBPhotoCollectionToolBarView()
+    let toolBarView = SBPhotoCollectionToolBarView(.preview)
     let bottomLayoutView = UIView()
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -186,6 +186,8 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
         bottomLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         toolBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
+        self.viewController.updateOriginalButton(button: toolBarView.originalButton)
+        toolBarView.delegate = self.viewController
         view.addSubview(toolBarView)
         toolBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addConstraints([

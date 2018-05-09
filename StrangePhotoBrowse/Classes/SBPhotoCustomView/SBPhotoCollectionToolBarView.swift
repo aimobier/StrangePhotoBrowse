@@ -54,6 +54,7 @@ class SBPhotoCollectionToolBarView: UIView {
     enum SBPhotoCollectionToolBarStyle{
         case normal
         case choice
+        case preview
     }
     
     init(_ style: SBPhotoCollectionToolBarStyle = .normal) {
@@ -63,10 +64,32 @@ class SBPhotoCollectionToolBarView: UIView {
         switch style {
         case .normal: makeNormal()
         case .choice: makeChoice()
+        case .preview: makePreview()
         }
     }
     
     func makeChoice(){
+        
+        cancelButtonMethod()
+    }
+    
+    func makeNormal(){
+        
+        choiceButtonMethod()
+        previewButtonMethod()
+        originalButtonMethod()
+    }
+    
+    func makePreview(){
+        
+        originalButtonMethod()
+    }
+}
+
+
+extension SBPhotoCollectionToolBarView{
+    
+    func cancelButtonMethod() {
         
         self.cancelButton.setAttributedTitle("返回".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.cancelButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
@@ -81,17 +104,7 @@ class SBPhotoCollectionToolBarView: UIView {
         self.cancelButton.addTarget(self, action: #selector(didClickCancelButton(button:)), for: .touchUpInside)
     }
     
-    func makeNormal(){
-        
-        self.choiceButton.setAttributedTitle("全部照片".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
-        self.choiceButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
-        self.choiceButton.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(choiceButton)
-        self.addConstraints([
-            NSLayoutConstraint(item: choiceButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: choiceButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 10),
-            NSLayoutConstraint(item: choiceButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
-            ])
+    private func previewButtonMethod(){
         
         self.previewButton.setAttributedTitle("预览".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.previewButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
@@ -103,8 +116,28 @@ class SBPhotoCollectionToolBarView: UIView {
             NSLayoutConstraint(item: previewButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
             ])
         
+        self.previewButton.addTarget(self, action: #selector(didClickPreviewButton(button:)), for: .touchUpInside)
+    }
+    
+    private func choiceButtonMethod(){
+        
+        self.choiceButton.setAttributedTitle("全部照片".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
+        self.choiceButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.choiceButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(choiceButton)
+        self.addConstraints([
+            NSLayoutConstraint(item: choiceButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: choiceButton, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 10),
+            NSLayoutConstraint(item: choiceButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.choiceButton.addTarget(self, action: #selector(didClickChoiceButton(button:)), for: .touchUpInside)
+    }
+    
+    private func originalButtonMethod(){
+        
         self.originalButton.setAttributedTitle("原图".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
-        self.originalButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.originalButton.centerButtonAndImageWithSpace(4)
         self.originalButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(originalButton)
         self.addConstraints([
@@ -113,8 +146,6 @@ class SBPhotoCollectionToolBarView: UIView {
             NSLayoutConstraint(item: originalButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
             ])
         
-        self.choiceButton.addTarget(self, action: #selector(didClickChoiceButton(button:)), for: .touchUpInside)
-        self.previewButton.addTarget(self, action: #selector(didClickPreviewButton(button:)), for: .touchUpInside)
         self.originalButton.addTarget(self, action: #selector(didClickOriginalButton(button:)), for: .touchUpInside)
     }
     

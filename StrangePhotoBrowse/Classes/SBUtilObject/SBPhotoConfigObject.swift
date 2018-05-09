@@ -36,6 +36,11 @@ public class SBPhotoConfigObject {
     /// 选中的图片 推荐大小 27*27 pickerSelectIndexMode 为true 则 不展示该 UIImage
     public var pickerSelectedImage = SBImageMake("photo_sel_photoPickerVc")
     
+    /// 原图 选择 默认 图片
+    public var pickerOriginalDefaultImage = SBImageMake("preview_original_def")
+    //// 原图 选择 选择图片
+    public var pickerOriginalSelectImage = SBImageMake("photo_original_sel")
+    
     /// 空白视图的 展位 属性
     public var emptyTitleAttributeString = "暂无更多图片".withTextColor(UIColor.white.a4).withFont(UIFont.f15.bold)
     public var emptySubTitleAttributeString = "你可以拍照，或者通过其他方式增加图片".withTextColor(UIColor.white.a4).withFont(UIFont.f13)

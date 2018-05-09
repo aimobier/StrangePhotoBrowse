@@ -7,11 +7,6 @@
 
 import UIKit
 
-enum NavgationBarStyle{
-    case normal
-    case cancel
-}
-
 protocol SBPhotoCollectionNavBarViewDelegate {
     
     /// 点击返回按钮
@@ -26,11 +21,16 @@ class SBPhotoCollectionNavBarView: UIView {
     
     var delegate:SBPhotoCollectionNavBarViewDelegate?
     
+    enum NavgationBarStyle{
+        case normal
+        case cancel
+    }
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
     
-    init(style: NavgationBarStyle = .normal) {
+    init(_ style: NavgationBarStyle = .normal) {
         
         super.init(frame: .zero)
         

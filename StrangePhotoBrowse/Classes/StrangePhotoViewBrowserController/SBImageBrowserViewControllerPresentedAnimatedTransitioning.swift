@@ -39,6 +39,21 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
         toSubViewController.imageView.contentMode = fromMode
         toViewController.view.backgroundColor = toViewController.view.backgroundColor?.a0
 
+        toViewController.topLayoutView.alpha = 0
+        toViewController.navgationBarView.alpha = 0
+        
+        toViewController.bottomLayoutView.alpha = 0
+        toViewController.toolBarView.alpha = 0
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
+            
+            toViewController.topLayoutView.alpha = 1
+            toViewController.navgationBarView.alpha = 1
+            
+            toViewController.bottomLayoutView.alpha = 1
+            toViewController.toolBarView.alpha = 1
+        }
+        
         UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
             
             toSubViewController.imageView.frame = toRect
@@ -91,6 +106,12 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         UIView.animate(withDuration: self.transitionDuration(using: transitionContext)) {
             
             fromViewController.view.backgroundColor = fromViewController.view.backgroundColor?.a0
+            
+            fromViewController.topLayoutView.alpha = 0
+            fromViewController.navgationBarView.alpha = 0
+            
+            fromViewController.bottomLayoutView.alpha = 0
+            fromViewController.toolBarView.alpha = 0
         }
         
         UIView.animate(withDuration: self.transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
