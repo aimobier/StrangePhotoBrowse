@@ -8,11 +8,6 @@
 import UIKit
 import Photos
 
-protocol SBImageBrowserViewControllerDelegate {
-    
-    func didChange(pageIndex:Int)
-}
-
 extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -24,10 +19,6 @@ extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
         
         return presentedAnimatedTransitioning
     }
-    
-//    func interactionControllerForPresentation(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
-//
-//    }
     
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         
@@ -70,15 +61,11 @@ class SBImageBrowserViewController: UIPageViewController{
         self.dataSource = self
         self.delegate = self
         
+        self.modalPresentationCapturesStatusBarAppearance = true
+        
         let viewController = SBImageViewController(asset: self.viewController.fetchResult.object(at: currentIndex), viewController: self)
         viewController.indexPage = currentIndex
         self.setViewControllers([viewController], direction: .forward, animated: false, completion: nil)
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle{ return .lightContent }
-    
-    override var prefersStatusBarHidden: Bool{
-        return topLayoutView.transform != .identity
     }
     
     override func viewDidLoad() {
@@ -89,6 +76,30 @@ class SBImageBrowserViewController: UIPageViewController{
         
         self.makeTopNavView()
         self.makeBottomToolView()
+    }
+    
+    var sbStatusBarStyle:UIStatusBarStyle = .lightContent{
+        didSet{
+            UIApplication.shared.setStatusBarStyle(sbStatusBarStyle, animated: true)
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+    var sbIsStatusBarHidden:Bool = false{
+        didSet{
+            UIApplication.shared.setStatusBarHidden(sbIsStatusBarHidden, with: UIStatusBarAnimation.none)
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+    }
+    
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation{
+        return .slide
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle{
+        return self.sbStatusBarStyle
+    }
+    override var prefersStatusBarHidden: Bool{
+        return self.sbIsStatusBarHidden
     }
 }
 
@@ -209,6 +220,8 @@ extension SBImageBrowserViewController{
                 
                 self.bottomLayoutView.transform = self.bottomLayoutView.transform.translatedBy(x: 0, y: self.bottomLayoutView.frame.height)
                 self.toolBarView.transform = self.toolBarView.transform.translatedBy(x: 0, y: self.toolBarView.frame.height+self.bottomLayoutView.frame.height)
+                
+                self.sbIsStatusBarHidden = true
             }else{
                 
                 self.view.backgroundColor = UIColor.white
@@ -220,9 +233,9 @@ extension SBImageBrowserViewController{
                 
                 self.toolBarView.transform = .identity
                 self.bottomLayoutView.transform = .identity
+                
+                self.sbIsStatusBarHidden = false
             }
-            
-            self.setNeedsStatusBarAppearanceUpdate()
         }
     }
 }

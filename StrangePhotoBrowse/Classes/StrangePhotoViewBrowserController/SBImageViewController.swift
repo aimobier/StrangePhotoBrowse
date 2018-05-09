@@ -84,6 +84,8 @@ class SBImageViewController: UIViewController {
             
             self?.imageView.image = image
         }
+        
+        self.viewController.sbStatusBarStyle = SBPhotoConfigObject.share.statusStyle
     }
 }
 

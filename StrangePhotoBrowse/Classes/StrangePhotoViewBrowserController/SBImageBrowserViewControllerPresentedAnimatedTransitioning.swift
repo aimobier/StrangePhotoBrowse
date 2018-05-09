@@ -123,6 +123,9 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     /// 该值为true时，才会进行来源页面的上下视图隐藏动画
     private var animateToHiddenTopAndBottomView = false
     
+    private var isHiddenStatusBar = false
+    private var statusBarStyle:UIStatusBarStyle = .lightContent
+    
     override func startInteractiveTransition(_ transitionContext: UIViewControllerContextTransitioning) {
         
         guard let toViewController = transitionContext.viewController(forKey: .to) as? StrangePhotoViewController,
@@ -153,6 +156,12 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         scale = 1
         rotation = 0
         currentImageCenterPoint = .zero
+        
+        if !SBPhotoConfigObject.share.BaseStatusBarViewController {
+            
+            fromViewController.sbIsStatusBarHidden = false
+            self.isHiddenStatusBar = fromViewController.sbIsStatusBarHidden
+        }
     }
     
     @discardableResult
@@ -200,6 +209,11 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             self.toCell.isHidden = false
             
             self.transitionContext.completeTransition(false)
+            
+            if !SBPhotoConfigObject.share.BaseStatusBarViewController {
+                
+                self.fromViewController.sbIsStatusBarHidden = self.isHiddenStatusBar
+            }
         }
     }
     

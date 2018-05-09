@@ -39,4 +39,10 @@ public class SBPhotoConfigObject {
     
     /// 两个分页视图之间的距离
     public var pageViewControllerOptionInterPageSpace = 10.f
+    
+    /// 默认的 lightContent
+    public var statusStyle:UIStatusBarStyle = .lightContent
+    
+    /// UIViewControllerBasedStatusBarAppearance - View controller-based status bar appearance
+    public let BaseStatusBarViewController:Bool = Bundle.main.object(forInfoDictionaryKey: "UIViewControllerBasedStatusBarAppearance") as? Bool ?? true
 }

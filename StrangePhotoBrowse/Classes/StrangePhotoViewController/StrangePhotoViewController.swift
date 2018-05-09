@@ -54,7 +54,7 @@ public class StrangePhotoViewController: UIViewController{
     /// 设置 StatusBar 类型
     public override var preferredStatusBarStyle: UIStatusBarStyle{
         
-        return .lightContent
+        return SBPhotoConfigObject.share.statusStyle
     }
     
     override public var title: String?{
@@ -80,6 +80,8 @@ public class StrangePhotoViewController: UIViewController{
         makeTopNavView()
         makeBottomToolView()
         makeCollectionView()
+        
+        UIApplication.shared.statusBarStyle = SBPhotoConfigObject.share.statusStyle
     }
     
     override public func viewDidAppear(_ animated: Bool) {
