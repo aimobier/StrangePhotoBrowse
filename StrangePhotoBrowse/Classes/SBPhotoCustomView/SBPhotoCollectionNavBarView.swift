@@ -9,13 +9,13 @@ import UIKit
 
 @objc protocol SBPhotoCollectionNavBarViewDelegate {
     
-    /// 点击返回按钮
+    /// 用户点击 NavgationBarView 中的 返回 按钮
     @objc optional func didClickCancelButton(button:UIButton)
     
-    /// 点击 SubMit 按钮
+    /// 用户点击 NavgationBarView 中的 发送 按钮
     @objc optional func didClickSubmitButton(button:UIButton)
     
-    /// 点击 close 按钮
+    /// 用户点击 NavgationBarView 中的 关闭 按钮
     @objc optional func didClickCloseButton(button:UIButton)
 }
 
@@ -65,10 +65,10 @@ class SBPhotoCollectionNavBarView: UIView {
     }
 }
 
-
+// MARK: - Layout and Button's Action Methods
 extension SBPhotoCollectionNavBarView{
     
-    func titleLabelMethod()  {
+    private func titleLabelMethod()  {
         
         self.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -78,7 +78,7 @@ extension SBPhotoCollectionNavBarView{
             ])
     }
     
-    func submitButtonMethod()  {
+    private func submitButtonMethod()  {
         
         addSubview(submitButton)
         submitButton.clipsToBounds = true
@@ -97,7 +97,7 @@ extension SBPhotoCollectionNavBarView{
         self.submitButton.addTarget(self, action: #selector(didClickSubmitButton(button:)), for: UIControlEvents.touchUpInside)
     }
     
-    func cancelButtonMethod(){
+    private func cancelButtonMethod(){
         
         self.addSubview(self.calcelButton)
         calcelButton.setImage(SBImageMake("navi_back"), for: UIControlState.normal)
@@ -112,7 +112,7 @@ extension SBPhotoCollectionNavBarView{
         self.calcelButton.addTarget(self, action: #selector(didClickCancelButton(button:)), for: UIControlEvents.touchUpInside)
     }
     
-    func closeButtonMethod(){
+    private func closeButtonMethod(){
         
         self.addSubview(self.closeButton)
         closeButton.setAttributedTitle("关闭".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)

@@ -7,33 +7,22 @@
 
 import UIKit
 
+/// ToolBarView Delegate
 @objc protocol SBPhotoCollectionToolBarViewDelegate {
     
-    /// 当点击预览按钮
-    ///
-    /// - Parameter button: 预览按钮
+    /// ToolBarView 点击预览按钮
     @objc optional func didClickPreviewButton(button: UIButton)
     
-    /// 当点击原图按钮
-    ///
-    /// - Parameter button: 原图按钮
+    /// ToolBarView 点击原图按钮
     @objc optional func didClickOriginalButton(button: UIButton)
     
-    /// 当点击选择按钮
-    ///
-    /// - Parameter button: 选择按钮
+    /// ToolBarView 点击选择按钮
     @objc optional func didClickChoiceButton(button: UIButton)
     
-    
-    /// 当点击返回按钮
-    ///
-    /// - Parameter button: 选择按钮
+    /// ToolBarView 点击返回按钮
     @objc optional func didClickCancelButton(button: UIButton)
     
-    
-    /// 当点击返回按钮
-    ///
-    /// - Parameter button: 选择按钮
+    /// ToolBarView 点击返回按钮
     @objc optional func didClickSelectButton(button: SBPhotoCollectionButton)
 }
 
@@ -60,6 +49,11 @@ class SBPhotoCollectionToolBarView: UIView {
         fatalError()
     }
     
+    /// ToolBarView 配置方式
+    ///
+    /// - normal: 默认的配置
+    /// - choice: 选择视图的 ToolBarView 配置
+    /// - preview: 预览视图的 ToolBarView 配置
     enum SBPhotoCollectionToolBarStyle{
         case normal
         case choice
@@ -96,7 +90,7 @@ class SBPhotoCollectionToolBarView: UIView {
     }
 }
 
-
+// MARK: - Layout and Button's Action Methods
 extension SBPhotoCollectionToolBarView{
     
     private func cancelButtonMethod() {

@@ -44,6 +44,8 @@ extension UIColor{
         )
     }
     
+    ////////// 颜色 Alpha 便捷方法
+    
     var a0: UIColor { return self.withAlphaComponent(0) }
     var a1: UIColor { return self.withAlphaComponent(0.1) }
     var a2: UIColor { return self.withAlphaComponent(0.2) }

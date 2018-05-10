@@ -1,5 +1,5 @@
 //
-//  UIAlertController.swift
+//  UIAlertController+sb.swift
 //  FLAnimatedImage
 //
 //  Created by 荆文征 on 2018/5/10.

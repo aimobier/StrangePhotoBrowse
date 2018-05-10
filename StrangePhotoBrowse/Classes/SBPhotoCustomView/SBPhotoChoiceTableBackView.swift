@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// 只有上方 Corner 方式
 class SBPhotoChoiceTableBackView: UIView{
     
     var maskLayer: CAShapeLayer!
@@ -18,6 +19,8 @@ class SBPhotoChoiceTableBackView: UIView{
         if maskLayer != nil { return }
         
         maskLayer = CAShapeLayer()
+        
+        // 制作 Mask 遮罩Layer
         maskLayer.path = UIBezierPath(roundedRect: rect, byRoundingCorners: [.topLeft,.topRight], cornerRadii: CGSize(width: 10, height: 10)).cgPath
         
         self.layer.mask = maskLayer

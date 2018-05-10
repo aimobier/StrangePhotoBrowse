@@ -9,75 +9,6 @@ import UIKit
 import Photos
 import FLAnimatedImage
 
-class SBPhotoChoiceCollectionViewControllerPresentedAnimatedTransitioning:NSObject, UIViewControllerAnimatedTransitioning{
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        
-        return 0.5
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        guard let toViewController = transitionContext.viewController(forKey: .to) as? SBPhotoChoiceCollectionViewController else{
-            fatalError("Boom shaga laga")
-        }
-        
-        let containerView = transitionContext.containerView
-        
-        containerView.addSubview(toViewController.view)
-        
-        toViewController.view.backgroundColor = UIColor.black.a0
-        
-        toViewController.backView.transform = toViewController.backView.transform.translatedBy(x: 0, y: toViewController.view.frame.height)
-        
-        toViewController.toolBarView.alpha = 0
-        toViewController.bottomLayoutView.alpha = 0
-        
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
-            
-            toViewController.view.backgroundColor = UIColor.black.a4
-            
-            toViewController.backView.transform = .identity
-            
-            
-            toViewController.toolBarView.alpha = 1
-            toViewController.bottomLayoutView.alpha = 1
-            
-        }) { (_) in
-            
-            transitionContext.completeTransition(true)
-        }
-    }
-}
-
-class SBPhotoChoiceCollectionViewControllerDismissedAnimatedTransitioning:NSObject, UIViewControllerAnimatedTransitioning{
-    
-    func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
-        
-        return 0.5
-    }
-    
-    func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
-        
-        guard let fromViewController = transitionContext.viewController(forKey: .from) as? SBPhotoChoiceCollectionViewController else{
-            fatalError("Boom sha ga la ga")
-        }
-        
-        UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
-            
-            fromViewController.view.backgroundColor = UIColor.black.a0
-            
-            fromViewController.backView.transform = fromViewController.backView.transform.translatedBy(x: 0, y: fromViewController.view.frame.height)
-            
-            fromViewController.toolBarView.alpha = 0
-            fromViewController.bottomLayoutView.alpha = 0
-        }) { (_) in
-            
-            transitionContext.completeTransition(true)
-        }
-    }
-}
-
 protocol SBPhotoChoiceCollectionViewControllerDelegate {
     
     /// 用户选择了 其他的相册
@@ -88,6 +19,7 @@ protocol SBPhotoChoiceCollectionViewControllerDelegate {
     func didChioce(assetCollection:PHAssetCollection?,fetchResults:PHFetchResult<PHAsset>)
 }
 
+// MARK: - UIViewControllerTransitioningDelegate
 extension SBPhotoChoiceCollectionViewController: UIViewControllerTransitioningDelegate{
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -121,10 +53,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     
     /// 自定义 UITableView
     private let tableView = UITableView()
-    fileprivate let backView = SBPhotoChoiceTableBackView()
-    
-    /// 配置文件
-    private let optionConfig:SBPhotoConfigObject
+    let backView = SBPhotoChoiceTableBackView()
     
     /// 选中的相册
     private var assetCollection:PHAssetCollection?
@@ -133,12 +62,13 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     fileprivate var assetCollectionCache = [IndexPath: IndexPathAssetCollection]()
     
     /// ViewController 下方的View
-    fileprivate let toolBarView = SBPhotoCollectionToolBarView(.choice)
-    fileprivate let bottomLayoutView = UIView()
+    let toolBarView = SBPhotoCollectionToolBarView(.choice)
+    let bottomLayoutView = UIView()
     
     init(delegate: SBPhotoChoiceCollectionViewControllerDelegate?=nil,assetCollection:PHAssetCollection?) {
-        self.optionConfig = SBPhotoConfigObject.share
+        
         self.delegate = delegate
+        
         super.init(nibName: nil, bundle: nil)
         
         self.assetCollection = assetCollection
@@ -218,8 +148,8 @@ extension SBPhotoChoiceCollectionViewController{
     /// 制作上方的 视图
     private func makeBottomToolView(){
         
-        bottomLayoutView.backgroundColor = self.optionConfig.navBarViewToolViewBackgroundColor
-        toolBarView.backgroundColor = self.optionConfig.navBarViewToolViewBackgroundColor
+        toolBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
+        bottomLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
         view.addSubview(bottomLayoutView)
         bottomLayoutView.translatesAutoresizingMaskIntoConstraints  = false
