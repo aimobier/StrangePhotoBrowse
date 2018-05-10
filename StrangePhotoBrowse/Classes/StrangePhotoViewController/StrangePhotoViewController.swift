@@ -318,6 +318,11 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         self.toolBarView.previewButton.isEnabled = isEnabled
         self.toolBarView.previewButton.setAttributedTitle(titleAttribute, for: .normal)
         
+        if let viewController = self.presentedViewController as? SBImageBrowserViewController{
+            
+            viewController.navgationBarView.submitButton.isEnabled = isEnabled
+        }
+        
         if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
             
             let indexPaths = self.collectionView.indexPathsForVisibleItems.filter(){ !self.selectedAsset.contains(self.fetchResult.object(at: $0.row)) }
@@ -365,6 +370,11 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
         let viewController = SBPhotoChoiceCollectionViewController(delegate: self, assetCollection: self.assetCollection)
         
         self.present(viewController, animated: true, completion: nil)
+    }
+    
+    func browserDidClickSubmitButton(viewController: SBImageBrowserViewController, button: UIButton) {
+        
+        self.didClickSubmitButton(button: button)
     }
     
     /// 照片 浏览 视图 点击选择按钮

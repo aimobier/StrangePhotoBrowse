@@ -15,6 +15,9 @@ protocol SBImageBrowserViewControllerDelegate {
     
     /// 视图 是否点击 原图按钮
     func browserDidClickOriginalButton(viewController:SBImageBrowserViewController,button: UIButton)
+    
+    /// 视图点击 提交按钮
+    func browserDidClickSubmitButton(viewController:SBImageBrowserViewController,button: UIButton)
 }
 
 extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
@@ -188,7 +191,7 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
 }
 
 
-extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
+extension SBImageBrowserViewController{
     
     /// 制作上方的 视图
     private func makeTopNavView() {
@@ -205,6 +208,8 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
             NSLayoutConstraint(item: navgationBarView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: navgationBarView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 44)
             ])
+        
+        navgationBarView.submitButton.isEnabled = self.viewController.navgationBarView.submitButton.isEnabled
         
         view.addSubview(topLayoutView)
         topLayoutView.translatesAutoresizingMaskIntoConstraints  = false
@@ -278,11 +283,6 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
         }
     }
     
-    func didClickCancelButton(button: UIButton) {
-        
-        self.dismiss(animated: true, completion: nil)
-    }
-    
     func updateToolBarViewSelectButton()  {
         
         guard let imageViewController = self.viewControllers?.first as? SBImageViewController else { return }
@@ -291,6 +291,18 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
     }
 }
 
+extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
+    
+    func didClickSubmitButton(button: UIButton) {
+        
+        self.browserDelegate?.browserDidClickSubmitButton(viewController: self, button: button)
+    }
+    
+    func didClickCancelButton(button: UIButton) {
+        
+        self.dismiss(animated: true, completion: nil)
+    }
+}
 
 extension SBImageBrowserViewController: SBPhotoCollectionToolBarViewDelegate{
     

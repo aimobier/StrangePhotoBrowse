@@ -54,6 +54,7 @@ class SBPhotoCollectionNavBarView: UIView {
         
         self.titleLabelMethod()
         self.cancelButtonMethod()
+        self.submitButtonMethod()
     }
     
     private func makeNormal(){
