@@ -320,9 +320,11 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         
         if let viewController = self.presentedViewController as? SBImageBrowserViewController{
             
+            viewController.collectionView.isHidden = !isEnabled
             viewController.navgationBarView.submitButton.isEnabled = isEnabled
         }
         
+        /// 最大的不对的话 则配置 梦层 白色
         if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
             
             let indexPaths = self.collectionView.indexPathsForVisibleItems.filter(){ !self.selectedAsset.contains(self.fetchResult.object(at: $0.row)) }
@@ -385,6 +387,20 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
         if let index = selectedAsset.index(of: imageViewController.item) {
             
             selectedAsset.remove(at: index)
+            
+            if let viewController = self.presentedViewController as? SBImageBrowserViewController {
+                
+                if  viewController.ispreview{
+                 
+                    viewController.collectionView.reloadItems(at: [IndexPath(item: index, section: 0)])
+                }else{
+                    
+                    viewController.collectionView.deleteItems(at: [IndexPath(item: index, section: 0)])
+                }
+            }
+            
+            reloadIndexAfterMethod(index: index)
+            
         }else{
             
             if self.selectedAsset.count >= SBPhotoConfigObject.share.maxCanSelectNumber {
@@ -393,6 +409,20 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
             }
             
             selectedAsset.append(imageViewController.item)
+            
+            if let viewController = self.presentedViewController as? SBImageBrowserViewController {
+                
+                let indexPath = IndexPath(item: selectedAsset.count-1, section: 0)
+                
+                if  viewController.ispreview{
+                    
+                    viewController.collectionView.reloadItems(at: [indexPath])
+                }else{
+                    
+                    viewController.collectionView.insertItems(at: [indexPath])
+                    viewController.collectionView.scrollToItem(at: indexPath, at: .right, animated: true)
+                }
+            }
         }
         
         button.sb_setSelected(index: selectedAsset.index(of: imageViewController.item), animate: true)
@@ -436,17 +466,7 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
     /// 弹出数目 超出的问题
     func alertMaxNumberWarningMethod(){
         
-        var viewController:UIViewController = self
-        
-        if let nViewController = self.presentedViewController {
-            
-            viewController = nViewController
-        }
-        
-        let alertController = UIAlertController(title: nil, message: "你最多只能选择\(SBPhotoConfigObject.share.maxCanSelectNumber)张照片", preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "我知道了", style: UIAlertActionStyle.cancel, handler: nil))
-        
-        viewController.present(alertController, animated: true, completion: nil)
+        UIAlertController.show(self.presentedViewController ?? self, message: "你最多可以选择\(SBPhotoConfigObject.share.maxCanSelectNumber)张照片")
     }
 }
 

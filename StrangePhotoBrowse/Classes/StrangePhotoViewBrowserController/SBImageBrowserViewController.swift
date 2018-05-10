@@ -7,6 +7,7 @@
 
 import UIKit
 import Photos
+import FLAnimatedImage
 
 protocol SBImageBrowserViewControllerDelegate {
     
@@ -62,6 +63,18 @@ class SBImageBrowserViewController: UIPageViewController{
     
     var browserDelegate: SBImageBrowserViewControllerDelegate?
     
+    var collectionView:UICollectionView!
+    /// 展示预览 视图的 UICollectionView
+    let collectionViewFlowLayout: UICollectionViewFlowLayout = {
+        
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.itemSize = CGSize(width: 40, height: 40)
+        layout.sectionInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        layout.minimumLineSpacing = 2
+        return layout
+    }()
+    
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     init(viewController: StrangePhotoViewController,currentIndex:Int,previews:[PHAsset]? = nil) {
         
@@ -106,6 +119,7 @@ class SBImageBrowserViewController: UIPageViewController{
         
         self.makeTopNavView()
         self.makeBottomToolView()
+        self.makeCollectionView()
         
         self.updateToolBarViewSelectButton()
     }
@@ -158,7 +172,7 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         
         let index = nViewController.indexPage - 1
         
-        if index <= 0 { return nil }
+        if index < 0 { return nil }
         
         let toViewController = SBImageViewController(asset: PHASSETDATASOURCE[index], viewController: self)
         
@@ -172,6 +186,8 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         didChangeViewControllerItem()
         
         updateToolBarViewSelectButton()
+        
+        changeIndexForRefreshCollectionView()
     }
     
     /// 当用户完成 了 PageViewController 切换 ViewController
@@ -221,6 +237,39 @@ extension SBImageBrowserViewController{
             ])
     }
     
+    private func makeCollectionView(){
+        
+        let borderView = UIView()
+        borderView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor.a1
+        borderView.translatesAutoresizingMaskIntoConstraints = false
+        toolBarView.addSubview(borderView)
+        self.view.addConstraints([
+            NSLayoutConstraint(item: borderView, attribute: .top, relatedBy: .equal, toItem: toolBarView, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: borderView, attribute: .left, relatedBy: .equal, toItem: toolBarView, attribute: .left, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: borderView, attribute: .right, relatedBy: .equal, toItem: toolBarView, attribute: .right, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: borderView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 0.5)
+            ])
+        
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.collectionViewFlowLayout)
+        collectionView.register(SBPhotoCollectionViewCell.self, forCellWithReuseIdentifier: "cell")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
+        collectionView.dataSource = self
+        collectionView.delegate = self
+        self.view.addSubview(collectionView)
+        view.addConstraints([
+            NSLayoutConstraint(item: collectionView, attribute: .bottom, relatedBy: .equal, toItem: toolBarView, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: collectionView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: collectionView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: collectionView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 60)
+            ])
+        
+        if !self.ispreview {
+            
+            self.collectionView.isHidden = self.collectionDataSource.count <= 0
+        }
+    }
+    
     /// 制作上方的 视图
     private func makeBottomToolView(){
         
@@ -264,6 +313,7 @@ extension SBImageBrowserViewController{
                 
                 self.bottomLayoutView.transform = self.bottomLayoutView.transform.translatedBy(x: 0, y: self.bottomLayoutView.frame.height)
                 self.toolBarView.transform = self.toolBarView.transform.translatedBy(x: 0, y: self.toolBarView.frame.height+self.bottomLayoutView.frame.height)
+                self.collectionView.transform = self.collectionView.transform.translatedBy(x: 0, y: self.toolBarView.frame.height+self.bottomLayoutView.frame.height+self.collectionView.frame.height)
                 
                 self.sbIsStatusBarHidden = true
             }else{
@@ -277,6 +327,7 @@ extension SBImageBrowserViewController{
                 
                 self.toolBarView.transform = .identity
                 self.bottomLayoutView.transform = .identity
+                self.collectionView.transform = .identity
                 
                 self.sbIsStatusBarHidden = false
             }
@@ -314,5 +365,110 @@ extension SBImageBrowserViewController: SBPhotoCollectionToolBarViewDelegate{
     func didClickOriginalButton(button: UIButton) {
         
         self.browserDelegate?.browserDidClickOriginalButton(viewController: self, button: button)
+    }
+}
+
+
+extension SBImageBrowserViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout{
+    
+    /// UICollectionView Data Source
+    var collectionDataSource: [PHAsset] {
+        
+        return ispreview ? self.previewDs! : self.viewController.selectedAsset
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        
+        return collectionDataSource.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! SBPhotoCollectionViewCell
+        
+        let asset = collectionDataSource[indexPath.row]
+        
+        cell.selectButton.isHidden = true
+        
+        cell.coverView.isHidden = true
+        
+        cell.layer.borderColor = SBPhotoConfigObject.share.mainColor.cgColor
+        
+        cell.layer.borderWidth = 0
+        
+        if let vc = self.viewControllers?.first as? SBImageViewController,vc.item == asset {
+        
+            cell.layer.borderWidth = 2
+        }
+        
+        if self.ispreview {
+            
+            cell.coverView.isHidden = self.viewController.selectedAsset.contains(asset)
+        }
+        
+        cell.representedAssetIdentifier = asset.localIdentifier
+        
+        if asset.isGif && SBPhotoConfigObject.share.showGifInCollectionMainView {
+            
+            PHImageManager.default().requestImageData(for: asset, options: nil) { (data, _, _, _) in
+                
+                guard let ndata = data,cell.representedAssetIdentifier == asset.localIdentifier else { return }
+                
+                cell.imageView.animatedImage = FLAnimatedImage(animatedGIFData: ndata)
+            }
+        }else{
+            
+            let width = self.collectionViewFlowLayout.itemSize.width
+            let scale = UIScreen.main.scale
+            let thumbnailSize = CGSize(width: width*scale, height: width*scale)
+            
+            PHImageManager.default().requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+                
+                if cell.representedAssetIdentifier == asset.localIdentifier {
+                
+                    cell.thumbnailImage = image
+                }
+            })
+        }
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+    
+        guard let asset = self.collectionDataSource[safe: indexPath.row],let cViewController = self.viewControllers?.first as? SBImageViewController else {
+            return
+        }
+        
+        if self.ispreview{
+            
+            let viewController = SBImageViewController(asset:asset, viewController: self)
+            
+            viewController.indexPage = collectionDataSource.index(of: asset)!
+            
+            self.setViewControllers([viewController], direction: cViewController.indexPage > viewController.indexPage ? .reverse : .forward, animated: true, completion: nil)
+            
+        }else{
+            
+            if self.viewController.fetchResult.contains(asset) {
+                
+                let viewController = SBImageViewController(asset:asset, viewController: self)
+                
+                viewController.indexPage = self.viewController.fetchResult.index(of: asset)
+                
+                return self.setViewControllers([viewController], direction: cViewController.indexPage > viewController.indexPage ? .reverse : .forward, animated: true, completion: nil)
+            }
+            
+            return UIAlertController.show(self.presentedViewController ?? self, message: "该照片不在本相册内，您可以选择“预览”来查看")
+        }
+        
+        self.updateToolBarViewSelectButton()
+        
+        self.changeIndexForRefreshCollectionView()
+    }
+    
+    /// 改变 Index 方法
+    private func changeIndexForRefreshCollectionView(){
+        
+        self.collectionView.reloadData()
     }
 }
