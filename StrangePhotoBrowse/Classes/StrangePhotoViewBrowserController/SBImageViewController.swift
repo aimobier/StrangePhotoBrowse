@@ -68,6 +68,10 @@ class SBImageViewController: UIViewController {
         self.view.addGestureRecognizer(imageTap)
         imageTap.require(toFail: doubleTap)
         
+        if self.viewController.ispreview {
+            return
+        }
+        
         pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(gesture:)))
         pan.maximumNumberOfTouches = 1
         pan.delaysTouchesBegan = true

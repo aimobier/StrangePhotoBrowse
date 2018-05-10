@@ -31,10 +31,12 @@ extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
     
     func interactionControllerForDismissal(using animator: UIViewControllerAnimatedTransitioning) -> UIViewControllerInteractiveTransitioning? {
         
-        if dismissedAnimatedTransitioning.isDismissInteractive{
+        if dismissedAnimatedTransitioning.isDismissInteractive && !ispreview{
             
             return dismissedAnimatedTransitioning
         }
+        
+        dismissedAnimatedTransitioning.isDismissInteractive = false
         
         return nil
     }
@@ -58,8 +60,10 @@ class SBImageBrowserViewController: UIPageViewController{
     var browserDelegate: SBImageBrowserViewControllerDelegate?
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-    init(viewController: StrangePhotoViewController,currentIndex:Int) {
+    init(viewController: StrangePhotoViewController,currentIndex:Int,previews:[PHAsset]? = nil) {
         
+        self.previewDs = previews
+        self.ispreview = self.previewDs != nil
         self.viewController = viewController
         
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: [
@@ -72,11 +76,23 @@ class SBImageBrowserViewController: UIPageViewController{
         self.dataSource = self
         self.delegate = self
         
+        self.browserDelegate = viewController
+        
         self.modalPresentationCapturesStatusBarAppearance = true
         
-        let viewController = SBImageViewController(asset: self.viewController.fetchResult.object(at: currentIndex), viewController: self)
+        let viewController = SBImageViewController(asset: PHASSETDATASOURCE[currentIndex], viewController: self)
         viewController.indexPage = currentIndex
         self.setViewControllers([viewController], direction: .forward, animated: false, completion: nil)
+    }
+    
+    let ispreview:Bool
+    private let previewDs:[PHAsset]?
+    /// DataSource
+    private var PHASSETDATASOURCE: [PHAsset] {
+        if ispreview {
+            return previewDs!
+        }
+        return self.viewController.fetchResult.getAllAsset()
     }
     
     override func viewDidLoad() {
@@ -124,9 +140,9 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         
         let index = nViewController.indexPage + 1
         
-        if index >= self.viewController.fetchResult.count { return nil }
+        if index >= PHASSETDATASOURCE.count { return nil }
         
-        let toViewController = SBImageViewController(asset: self.viewController.fetchResult.object(at: index), viewController: self)
+        let toViewController = SBImageViewController(asset: PHASSETDATASOURCE[index], viewController: self)
         
         toViewController.indexPage = index
         
@@ -141,7 +157,7 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         
         if index <= 0 { return nil }
         
-        let toViewController = SBImageViewController(asset: self.viewController.fetchResult.object(at: index), viewController: self)
+        let toViewController = SBImageViewController(asset: PHASSETDATASOURCE[index], viewController: self)
         
         toViewController.indexPage = index
         
@@ -155,6 +171,9 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         updateToolBarViewSelectButton()
     }
     
+    /// 当用户完成 了 PageViewController 切换 ViewController
+    /// 切换完成之后 获取 IndexPath ，如果 VisibleItems 不存在该 IndexPath
+    /// 则显示 CollectionView 进行 ScrollToItem 处理 用于完成 Dismiss Cell 切换动画使用
     func didChangeViewControllerItem()  {
         
         guard let currentViewController = self.viewControllers?.first as? SBImageViewController else { return }

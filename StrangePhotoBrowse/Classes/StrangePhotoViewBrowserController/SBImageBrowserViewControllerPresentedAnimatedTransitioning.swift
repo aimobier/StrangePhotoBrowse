@@ -18,6 +18,19 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
         
         let containerView = transitionContext.containerView
         
+        if let toViewController = transitionContext.viewController(forKey: .to) as? SBImageBrowserViewController,toViewController.ispreview {
+            
+            containerView.addSubview(toViewController.view)
+            toViewController.view.transform = toViewController.view.transform.translatedBy(x: toViewController.view.frame.width, y: 0)
+            UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
+                toViewController.view.transform = .identity
+            }) { (_) in
+                
+                transitionContext.completeTransition(true)
+            }
+            return;
+        }
+        
         guard let toViewController = transitionContext.viewController(forKey: .to) as? SBImageBrowserViewController,
             let fromViewController = transitionContext.viewController(forKey: .from) as? StrangePhotoViewController,
             let indexPath = fromViewController.collectionView.indexPathsForSelectedItems?.first,
@@ -81,6 +94,18 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {
+        
+        if let toViewController = transitionContext.viewController(forKey: .to) ,let fromViewController = transitionContext.viewController(forKey: .from) as? SBImageBrowserViewController,fromViewController.ispreview {
+            
+            transitionContext.containerView.insertSubview(toViewController.view, at: 0)
+            UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
+                fromViewController.view.transform = fromViewController.view.transform.translatedBy(x: toViewController.view.frame.width, y: 0)
+            }) { (_) in
+                
+                transitionContext.completeTransition(true)
+            }
+            return;
+        }
         
         guard let toViewController = transitionContext.viewController(forKey: .to) as? StrangePhotoViewController,
             let fromViewController = transitionContext.viewController(forKey: .from) as? SBImageBrowserViewController,

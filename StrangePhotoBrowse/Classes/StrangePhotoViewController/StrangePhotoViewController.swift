@@ -315,7 +315,9 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
     /// 点击 预览按钮
     func didClickPreviewButton(button: UIButton) {
         
-        print("点击预览按钮")
+        let viewController = SBImageBrowserViewController(viewController: self, currentIndex: 0, previews: self.selectedAsset)
+        
+        self.present(viewController, animated: true, completion: nil)
     }
     
     /// 点击原图按钮
@@ -527,8 +529,6 @@ extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         let viewController = SBImageBrowserViewController(viewController: self, currentIndex: indexPath.row)
-        
-        viewController.browserDelegate = self
         
         self.present(viewController, animated: true, completion: nil)
     }
