@@ -53,7 +53,7 @@ public class StrangePhotoViewController: UIViewController{
     }()
     
     /// 当前选中的 Asset
-    private var selectedAsset = [PHAsset]()
+    var selectedAsset = [PHAsset]()
     
     /// 设置 StatusBar 类型
     public override var preferredStatusBarStyle: UIStatusBarStyle{
@@ -155,6 +155,8 @@ extension StrangePhotoViewController{
             NSLayoutConstraint(item: toolBarView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: toolBarView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 40)
             ])
+        
+        refreshPreViewButtonState()
     }
     
     /// 制作展示图片的 CollectionView
@@ -231,6 +233,9 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         return cell
     }
     
+    /// 当用户点击了Cell中的选择按钮
+    ///
+    /// - Parameter cell: cell
     func cellDidSelectButtonClick(_ cell: SBPhotoCollectionViewCell) {
         
         guard let index = self.collectionView.indexPath(for: cell) else{
@@ -250,12 +255,14 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
             selectedAsset.append(asset)
             cell.selectButton.sb_setSelected(index: selectedAsset.index(of: asset), animate: true)
         }
+        
+        refreshPreViewButtonState()
     }
     
     /// 刷新 index 之后的 选中视图
     ///
     /// - Parameter index: index
-    func reloadIndexAfterMethod(index:Int){
+    private func reloadIndexAfterMethod(index:Int){
         
         if self.selectedAsset.count - index == 0 {
             
@@ -281,7 +288,167 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
             self.collectionView.reloadItems(at: indexPaths)
         }
     }
+    
+    /// 刷新 预览按钮 状态
+    private func refreshPreViewButtonState(){
+        
+        let isEnabled:Bool
+        let titleAttribute:NSAttributedString
+        
+        if self.selectedAsset.count <= 0 {
+            isEnabled = false
+            titleAttribute = "预览".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold)
+        }else{
+            
+            isEnabled = true
+            titleAttribute = "预览(\(self.selectedAsset.count))".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold)
+        }
+        
+        self.toolBarView.previewButton.isEnabled = isEnabled
+        self.toolBarView.previewButton.setAttributedTitle(titleAttribute, for: .normal)
+    }
 }
+
+
+extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBImageBrowserViewControllerDelegate{
+
+    /// 点击 预览按钮
+    func didClickPreviewButton(button: UIButton) {
+        
+        print("点击预览按钮")
+    }
+    
+    /// 点击原图按钮
+    func didClickOriginalButton(button: UIButton) {
+        
+        self.isOriginal = !isOriginal
+        
+        self.updateOriginalButton(button: button)
+    }
+
+    /// 点击 选择相册 按钮
+    func didClickChoiceButton(button: UIButton) {
+        
+        let viewController = SBPhotoChoiceCollectionViewController(delegate: self, assetCollection: self.assetCollection)
+        
+        self.present(viewController, animated: true, completion: nil)
+    }
+    
+    /// 照片 浏览 视图 点击选择按钮
+    func browserDidClickSelectButton(viewController: SBImageBrowserViewController, button: SBPhotoCollectionButton) {
+        
+        guard let imageViewController = viewController.viewControllers?.first as? SBImageViewController else{ return }
+        
+        if let index = selectedAsset.index(of: imageViewController.item) {
+            
+            selectedAsset.remove(at: index)
+        }else{
+            
+            selectedAsset.append(imageViewController.item)
+        }
+        
+        button.sb_setSelected(index: selectedAsset.index(of: imageViewController.item), animate: true)
+        
+        let indexPath = IndexPath(item: self.allPhotos.index(of: imageViewController.item), section: 0)
+        
+        if let cell = collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell  {
+        
+            cell.selectButton.sb_setSelected(index: selectedAsset.index(of: imageViewController.item), animate: false)
+        }
+        
+        refreshPreViewButtonState()
+    }
+    
+    /// 照片 浏览视图 点击原图按钮
+    func browserDidClickOriginalButton(viewController: SBImageBrowserViewController, button: UIButton) {
+        
+        self.isOriginal = !isOriginal
+        
+        self.updateOriginalButton(button: button)
+        
+        self.updateOriginalButton(button: self.toolBarView.originalButton)
+    }
+    
+    /// 更新 原图的 按钮 状态
+    ///
+    /// - Parameter button: 按钮
+    func updateOriginalButton(button: UIButton){
+        
+        if self.isOriginal {
+        
+            button.setImage(SBPhotoConfigObject.share.pickerOriginalSelectImage, for: .normal)
+        }else{
+            
+            button.setImage(SBPhotoConfigObject.share.pickerOriginalDefaultImage, for: .normal)
+        }
+        
+        button.setAttributedTitle(button.attributedTitle(for: .normal), for: .normal)
+    }
+}
+
+/// MARK: - SBPhotoChoiceCollectionViewControllerDelegate
+/// 当用户 在选择相册视图中 点击了 UITableViewCell
+/// 将此视图 完成 内容重新布置
+extension StrangePhotoViewController: SBPhotoChoiceCollectionViewControllerDelegate{
+    
+    func didChioce(assetCollection: PHAssetCollection?, fetchResults: PHFetchResult<PHAsset>) {
+        
+        if self.fetchResult == fetchResults{
+            return
+        }
+        
+        self.title = assetCollection?.localizedTitle ?? "全部照片"
+        
+        self.dismiss(animated: true, completion: nil)
+        
+        self.fetchResult = fetchResults
+        self.assetCollection = assetCollection
+        
+        self.collectionView.reloadData()
+    }
+}
+
+
+// MARK: - PHPhotoLibraryChangeObserver
+extension StrangePhotoViewController: PHPhotoLibraryChangeObserver{
+    
+    public func photoLibraryDidChange(_ changeInstance: PHChange) {
+        
+        guard let changes = changeInstance.changeDetails(for: fetchResult)
+            else { return }
+        // Change notifications may be made on a background queue. Re-dispatch to the
+        // main queue before acting on the change as we'll be updating the UI.
+        DispatchQueue.main.sync {
+            // Hang on to the new fetch result.
+            fetchResult = changes.fetchResultAfterChanges
+            if changes.hasIncrementalChanges {
+                // If we have incremental diffs, animate them in the collection view.
+                collectionView.performBatchUpdates({
+                    // For indexes to make sense, updates must be in this order:
+                    // delete, insert, reload, move
+                    if let removed = changes.removedIndexes, removed.count > 0 {
+                        collectionView.deleteItems(at: removed.map({ IndexPath(item: $0, section: 0) }))
+                    }
+                    if let inserted = changes.insertedIndexes, inserted.count > 0 {
+                        collectionView.insertItems(at: inserted.map({ IndexPath(item: $0, section: 0) }))
+                    }
+                    if let changed = changes.changedIndexes, changed.count > 0 {
+                        collectionView.reloadItems(at: changed.map({ IndexPath(item: $0, section: 0) }))
+                    }
+                    changes.enumerateMoves { fromIndex, toIndex in
+                        self.collectionView.moveItem(at: IndexPath(item: fromIndex, section: 0),
+                                                     to: IndexPath(item: toIndex, section: 0))
+                    }
+                })
+            } else {
+                // Reload the collection view if incremental diffs are not available.
+                collectionView.reloadData()
+            }
+            resetCachedAssets()
+        }
+    }
+}
+
 
 
 // MARK: - UICollectionViewDelegateFlowLayout
@@ -361,103 +528,8 @@ extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
         
         let viewController = SBImageBrowserViewController(viewController: self, currentIndex: indexPath.row)
         
-        self.present(viewController, animated: true, completion: nil)
-    }
-}
-
-
-// MARK: - PHPhotoLibraryChangeObserver
-extension StrangePhotoViewController: PHPhotoLibraryChangeObserver{
-    
-    public func photoLibraryDidChange(_ changeInstance: PHChange) {
-        
-        guard let changes = changeInstance.changeDetails(for: fetchResult)
-            else { return }
-        // Change notifications may be made on a background queue. Re-dispatch to the
-        // main queue before acting on the change as we'll be updating the UI.
-        DispatchQueue.main.sync {
-            // Hang on to the new fetch result.
-            fetchResult = changes.fetchResultAfterChanges
-            if changes.hasIncrementalChanges {
-                // If we have incremental diffs, animate them in the collection view.
-                collectionView.performBatchUpdates({
-                    // For indexes to make sense, updates must be in this order:
-                    // delete, insert, reload, move
-                    if let removed = changes.removedIndexes, removed.count > 0 {
-                        collectionView.deleteItems(at: removed.map({ IndexPath(item: $0, section: 0) }))
-                    }
-                    if let inserted = changes.insertedIndexes, inserted.count > 0 {
-                        collectionView.insertItems(at: inserted.map({ IndexPath(item: $0, section: 0) }))
-                    }
-                    if let changed = changes.changedIndexes, changed.count > 0 {
-                        collectionView.reloadItems(at: changed.map({ IndexPath(item: $0, section: 0) }))
-                    }
-                    changes.enumerateMoves { fromIndex, toIndex in
-                        self.collectionView.moveItem(at: IndexPath(item: fromIndex, section: 0),
-                                                to: IndexPath(item: toIndex, section: 0))
-                    }
-                })
-            } else {
-                // Reload the collection view if incremental diffs are not available.
-                collectionView.reloadData()
-            }
-            resetCachedAssets()
-        }
-    }
-}
-
-
-extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate{
-    
-    func didClickPreviewButton(button: UIButton) {
-        
-    }
-    
-    func didClickOriginalButton(button: UIButton) {
-        
-        self.isOriginal = !isOriginal
-        
-        if button == self.toolBarView.originalButton {
-            self.updateOriginalButton(button: button)
-        }else{
-            self.updateOriginalButton(button: button)
-            self.updateOriginalButton(button: self.toolBarView.originalButton)
-        }
-    }
-
-    func updateOriginalButton(button: UIButton){
-        if self.isOriginal {
-            button.setImage(SBPhotoConfigObject.share.pickerOriginalSelectImage, for: .normal)
-        }else{
-            button.setImage(SBPhotoConfigObject.share.pickerOriginalDefaultImage, for: .normal)
-        }
-        button.setAttributedTitle(button.attributedTitle(for: .normal), for: .normal)
-    }
-    
-    func didClickChoiceButton(button: UIButton) {
-        
-        let viewController = SBPhotoChoiceCollectionViewController(delegate: self, assetCollection: self.assetCollection)
+        viewController.browserDelegate = self
         
         self.present(viewController, animated: true, completion: nil)
-    }
-}
-
-
-extension StrangePhotoViewController: SBPhotoChoiceCollectionViewControllerDelegate{
-    
-    func didChioce(assetCollection: PHAssetCollection?, fetchResults: PHFetchResult<PHAsset>) {
-        
-        if self.fetchResult == fetchResults{
-            return
-        }
-        
-        self.title = assetCollection?.localizedTitle ?? "全部照片"
-        
-        self.dismiss(animated: true, completion: nil)
-        
-        self.fetchResult = fetchResults
-        self.assetCollection = assetCollection
-        
-        self.collectionView.reloadData()
     }
 }

@@ -29,6 +29,12 @@ import UIKit
     ///
     /// - Parameter button: 选择按钮
     @objc optional func didClickCancelButton(button: UIButton)
+    
+    
+    /// 当点击返回按钮
+    ///
+    /// - Parameter button: 选择按钮
+    @objc optional func didClickSelectButton(button: SBPhotoCollectionButton)
 }
 
 class SBPhotoCollectionToolBarView: UIView {
@@ -46,6 +52,9 @@ class SBPhotoCollectionToolBarView: UIView {
     
     /// 返回按钮
     let cancelButton = UIButton(type: .system)
+    
+    /// 选中按钮
+    let selectButton = SBPhotoCollectionButton(type: .system)
     
     required init?(coder aDecoder: NSCoder) {
         fatalError()
@@ -83,13 +92,14 @@ class SBPhotoCollectionToolBarView: UIView {
     func makePreview(){
         
         originalButtonMethod()
+        selectButtonMethod()
     }
 }
 
 
 extension SBPhotoCollectionToolBarView{
     
-    func cancelButtonMethod() {
+    private func cancelButtonMethod() {
         
         self.cancelButton.setAttributedTitle("返回".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.cancelButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
@@ -106,10 +116,10 @@ extension SBPhotoCollectionToolBarView{
     
     private func previewButtonMethod(){
         
-        self.previewButton.setAttributedTitle("预览".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
         self.previewButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
         self.previewButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(previewButton)
+        self.previewButton.setAttributedTitle("预览".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor.a3).withFont(UIFont.f13.bold), for: .disabled)
         self.addConstraints([
             NSLayoutConstraint(item: previewButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
             NSLayoutConstraint(item: previewButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: -10),
@@ -136,7 +146,7 @@ extension SBPhotoCollectionToolBarView{
     
     private func originalButtonMethod(){
         
-        self.originalButton.setAttributedTitle("原图".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold), for: .normal)
+        self.originalButton.setAttributedTitle("原图".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f10.bold), for: .normal)
         self.originalButton.centerButtonAndImageWithSpace(4)
         self.originalButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(originalButton)
@@ -147,6 +157,21 @@ extension SBPhotoCollectionToolBarView{
             ])
         
         self.originalButton.addTarget(self, action: #selector(didClickOriginalButton(button:)), for: .touchUpInside)
+    }
+    
+    private func selectButtonMethod(){
+        
+        self.selectButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 8, bottom: 2, right: 8)
+        self.selectButton.translatesAutoresizingMaskIntoConstraints = false
+        self.addSubview(selectButton)
+        self.selectButton.setImage(SBPhotoConfigObject.share.pickerDefaultImage, for: .normal)
+        self.addConstraints([
+            NSLayoutConstraint(item: selectButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: selectButton, attribute: .right, relatedBy: .equal, toItem: self, attribute: .right, multiplier: 1, constant: -10),
+            NSLayoutConstraint(item: selectButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0)
+            ])
+        
+        self.selectButton.addTarget(self, action: #selector(didClickSelectButton(button:)), for: .touchUpInside)
     }
     
     @objc func didClickPreviewButton(button: UIButton){
@@ -173,6 +198,13 @@ extension SBPhotoCollectionToolBarView{
     @objc func didClickCancelButton(button: UIButton){
         
         guard let method =  self.delegate?.didClickCancelButton else{ return }
+        
+        method(button)
+    }
+    
+    @objc func didClickSelectButton(button: SBPhotoCollectionButton){
+     
+        guard let method =  self.delegate?.didClickSelectButton else{ return }
         
         method(button)
     }

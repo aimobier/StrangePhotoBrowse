@@ -8,6 +8,15 @@
 import UIKit
 import Photos
 
+protocol SBImageBrowserViewControllerDelegate {
+    
+    /// 视图 是否点击 选择按钮
+    func browserDidClickSelectButton(viewController:SBImageBrowserViewController,button: SBPhotoCollectionButton)
+    
+    /// 视图 是否点击 原图按钮
+    func browserDidClickOriginalButton(viewController:SBImageBrowserViewController,button: UIButton)
+}
+
 extension SBImageBrowserViewController: UIViewControllerTransitioningDelegate{
     
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
@@ -36,7 +45,7 @@ class SBImageBrowserViewController: UIPageViewController{
     var dismissedAnimatedTransitioning = SBImageBrowserViewControllerDismissedAnimatedTransitioning()
     var presentedAnimatedTransitioning = SBImageBrowserViewControllerPresentedAnimatedTransitioning()
     
-    private let viewController: StrangePhotoViewController
+    let viewController: StrangePhotoViewController
     
     /// ViewController 上方的View
     let topLayoutView = UIView()
@@ -45,6 +54,8 @@ class SBImageBrowserViewController: UIPageViewController{
     /// ViewController 下方的View
     let toolBarView = SBPhotoCollectionToolBarView(.preview)
     let bottomLayoutView = UIView()
+    
+    var browserDelegate: SBImageBrowserViewControllerDelegate?
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
     init(viewController: StrangePhotoViewController,currentIndex:Int) {
@@ -76,6 +87,8 @@ class SBImageBrowserViewController: UIPageViewController{
         
         self.makeTopNavView()
         self.makeBottomToolView()
+        
+        self.updateToolBarViewSelectButton()
     }
     
     var sbStatusBarStyle:UIStatusBarStyle = .lightContent{
@@ -138,6 +151,8 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
     func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
         didChangeViewControllerItem()
+        
+        updateToolBarViewSelectButton()
     }
     
     func didChangeViewControllerItem()  {
@@ -145,7 +160,9 @@ extension SBImageBrowserViewController: UIPageViewControllerDataSource,UIPageVie
         guard let currentViewController = self.viewControllers?.first as? SBImageViewController else { return }
         
         let indexPath = IndexPath(item: currentViewController.indexPage, section: 0)
+        
         if !self.viewController.collectionView.indexPathsForVisibleItems.contains(indexPath) {
+            
             viewController.collectionView.scrollToItem(at: indexPath, at: UICollectionViewScrollPosition.centeredVertically, animated: false)
         }
     }
@@ -187,7 +204,7 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
         toolBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
         self.viewController.updateOriginalButton(button: toolBarView.originalButton)
-        toolBarView.delegate = self.viewController
+        toolBarView.delegate = self
         view.addSubview(toolBarView)
         toolBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addConstraints([
@@ -245,5 +262,26 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
     func didClickCancelButton(button: UIButton) {
         
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    func updateToolBarViewSelectButton()  {
+        
+        guard let imageViewController = self.viewControllers?.first as? SBImageViewController else { return }
+        
+        self.toolBarView.selectButton.sb_setSelected(index: self.viewController.selectedAsset.index(of: imageViewController.item), animate: false)
+    }
+}
+
+
+extension SBImageBrowserViewController: SBPhotoCollectionToolBarViewDelegate{
+    
+    func didClickSelectButton(button: SBPhotoCollectionButton) {
+        
+        self.browserDelegate?.browserDidClickSelectButton(viewController: self, button: button)
+    }
+    
+    func didClickOriginalButton(button: UIButton) {
+        
+        self.browserDelegate?.browserDidClickOriginalButton(viewController: self, button: button)
     }
 }

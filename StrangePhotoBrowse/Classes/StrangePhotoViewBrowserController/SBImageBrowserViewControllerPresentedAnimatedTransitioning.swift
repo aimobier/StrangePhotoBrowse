@@ -142,7 +142,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     private var fromViewController:SBImageBrowserViewController!
     private var fromSubViewController:SBImageViewController!
     
-    private var toCell:SBPhotoCollectionViewCell!
+    private var toCell:SBPhotoCollectionViewCell?
     
     /// 该值为true时，才会进行来源页面的上下视图隐藏动画
     private var animateToHiddenTopAndBottomView = false
@@ -178,7 +178,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         }
         
         toCell = cell
-        toCell.isHidden = true
+        toCell?.isHidden = true
         
         animateToHiddenTopAndBottomView = fromViewController.navgationBarView.transform == .identity
         
@@ -229,6 +229,16 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     override func cancel() {
         
+        if self.toCell == nil {
+            
+            let indexPath = IndexPath(item: fromSubViewController.indexPage, section: 0)
+            
+            if let cell = toViewController.collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell {
+                
+                self.toCell = cell
+            }
+        }
+        
         UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
             
             self.makeProgress(progress: 0)
@@ -240,7 +250,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             self.fromSubViewController.imageView.center = self.fromSubViewController.startImagePoint
         }) { (_) in
             
-            self.toCell.isHidden = false
+            self.toCell?.isHidden = false
             
             self.transitionContext.completeTransition(false)
             
@@ -253,8 +263,14 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     override func finish() {
 
-        let toMode = toCell.imageView.contentMode
-        let toRect = toViewController.view.convert(toCell.frame, from: toViewController.collectionView)
+        guard let cell = toCell else {
+            
+            self.transitionContext.completeTransition(true)
+            return
+        }
+        
+        let toMode = cell.imageView.contentMode
+        let toRect = toViewController.view.convert(cell.frame, from: toViewController.collectionView)
         
         UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
             
@@ -269,7 +285,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             
         }) { (_) in
             
-            self.toCell.isHidden = false
+            cell.isHidden = false
             
             self.transitionContext.completeTransition(true)
         }
