@@ -80,4 +80,35 @@ extension UIImage{
         }
         return image
     }
+    
+    /// 通过颜色创建一张图片
+    ///
+    /// - Parameters:
+    ///   - color: 颜色
+    ///   - size: 大小
+    /// - Returns: 图片对象
+    static func create(color: UIColor, size: CGSize = CGSize(width: 1, height: 1),cornerRadius: CGFloat=0) -> UIImage{
+        /// The base rectangle of the image.
+        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        UIGraphicsBeginImageContext(rect.size)
+        
+        /// The graphics context of the image.
+        let context = UIGraphicsGetCurrentContext()
+        context?.setFillColor(color.cgColor)
+        context?.fill(rect)
+        
+        /// Image that will be retured.
+        var image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        UIGraphicsBeginImageContext(size)
+        
+        UIBezierPath(roundedRect: rect, cornerRadius:cornerRadius).addClip()
+        image?.draw(in: rect)
+        
+        image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return image!
+    }
 }

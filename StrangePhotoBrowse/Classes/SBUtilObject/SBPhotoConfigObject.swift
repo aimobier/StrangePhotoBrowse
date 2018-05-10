@@ -21,9 +21,9 @@ public class SBPhotoConfigObject {
     /// 每一行展示的照片数目
     public var perLineDisplayNumber = 4
     
-    /// 上下方的 NavBar ToolBar Back Color
-    public var navBarViewToolViewTitleTextColor = UIColor.white
     /// 上下方的 NavBar ToolBar Title Text Color
+    public var navBarViewToolViewTitleTextColor = UIColor.white
+    /// 上下方的 NavBar ToolBar Back Color
     public var navBarViewToolViewBackgroundColor = UIColor(rgb: 0x272A31)
     
     /// 展示图片的背景颜色

@@ -110,6 +110,8 @@ extension StrangePhotoViewController{
         topLayoutView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         navgationBarView.backgroundColor = SBPhotoConfigObject.share.navBarViewToolViewBackgroundColor
         
+        navgationBarView.delegate = self
+        
         view.addSubview(navgationBarView)
         navgationBarView.translatesAutoresizingMaskIntoConstraints = false
         view.addConstraints([
@@ -304,8 +306,22 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
             titleAttribute = "预览(\(self.selectedAsset.count))".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f13.bold)
         }
         
+        self.navgationBarView.submitButton.isEnabled = isEnabled
         self.toolBarView.previewButton.isEnabled = isEnabled
         self.toolBarView.previewButton.setAttributedTitle(titleAttribute, for: .normal)
+    }
+}
+
+extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
+    
+    func didClickCloseButton(button: UIButton) {
+        
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    func didClickSubmitButton(button: UIButton) {
+        
+        print("发送")
     }
 }
 
