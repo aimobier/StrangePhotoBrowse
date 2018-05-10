@@ -28,13 +28,14 @@ public class StrangePhotoViewController: UIViewController{
     let toolBarView = SBPhotoCollectionToolBarView()
     let bottomLayoutView = UIView()
     
-    /// 默认的 collectionView FlowLayout
-    
+    /// 空白示意图
     private var emptyView:SBPhotoEmptyView!
     
-    private var thumbnailSize:CGSize!
+    private var thumbnailSize:CGSize! // 缩略图大小
     private var previousPreheatRect = CGRect.zero
     var collectionView : UICollectionView!
+    
+    /// 默认的 collectionView FlowLayout
     private let collectionViewFlowLayout = UICollectionViewFlowLayout()
     
     /// 是否选择了原图
@@ -48,7 +49,7 @@ public class StrangePhotoViewController: UIViewController{
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
         let allPhotosOptions = PHFetchOptions()
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         return PHAsset.fetchAssets(with: allPhotosOptions)
     }()
     
@@ -86,6 +87,17 @@ public class StrangePhotoViewController: UIViewController{
         makeCollectionView()
         
         UIApplication.shared.statusBarStyle = SBPhotoConfigObject.share.statusStyle
+    }
+    
+    private var _isFirstNeedToScrollBottom = true
+    public override func viewDidLayoutSubviews() {
+        
+        super.viewDidLayoutSubviews()
+        
+        if _isFirstNeedToScrollBottom {
+            _isFirstNeedToScrollBottom = false
+            collectionView.scrollToItem(at: IndexPath(item: SBPhotoConfigObject.share.canTakePictures ? self.fetchResult.count : self.fetchResult.count-1, section: 0), at: .bottom, animated: false)
+        }
     }
     
     override public func viewDidAppear(_ animated: Bool) {
@@ -188,7 +200,8 @@ extension StrangePhotoViewController{
         
         collectionView.delegate = self
         collectionView.dataSource = self
-        collectionView.register(SBPhotoCollectionViewCell.self, forCellWithReuseIdentifier: String(describing: SBPhotoCollectionViewCell.self))
+        collectionView.register(SBPhotoCollectionViewCell.self, forCellWithReuseIdentifier: "SBPhotoCollectionViewCell")
+        collectionView.register(SBPhotographCollectionViewCell.self, forCellWithReuseIdentifier: "SBPhotographCollectionViewCell")
     }
 }
 
@@ -204,14 +217,19 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return realmNumber(fetchResult.count)
+        return realmNumber(fetchResult.count)+(SBPhotoConfigObject.share.canTakePictures ? 1 : 0)
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
+        if indexPath.item == fetchResult.count {
+            
+            return collectionView.dequeueReusableCell(withReuseIdentifier: "SBPhotographCollectionViewCell", for: indexPath)
+        }
+        
         let asset = fetchResult.object(at: indexPath.item)
         
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: String(describing: SBPhotoCollectionViewCell.self), for: indexPath) as? SBPhotoCollectionViewCell
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SBPhotoCollectionViewCell", for: indexPath) as? SBPhotoCollectionViewCell
             else { fatalError("unexpected cell in collection view") }
         
         cell.delegate = self
@@ -489,6 +507,8 @@ extension StrangePhotoViewController: SBPhotoChoiceCollectionViewControllerDeleg
         self.assetCollection = assetCollection
         
         self.collectionView.reloadData()
+        
+        collectionView.scrollToItem(at: IndexPath(item: SBPhotoConfigObject.share.canTakePictures ? self.fetchResult.count : self.fetchResult.count-1, section: 0), at: .bottom, animated: false)
     }
 }
 
@@ -567,9 +587,11 @@ extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
         let (addedRects, removedRects) = differencesBetweenRects(previousPreheatRect, preheatRect)
         let addedAssets = addedRects
             .flatMap { rect in collectionView!.indexPathsForElements(in: rect) }
+            .filter{ $0.item != self.fetchResult.count || !SBPhotoConfigObject.share.canTakePictures }
             .map { indexPath in fetchResult.object(at: indexPath.item) }
         let removedAssets = removedRects
             .flatMap { rect in collectionView!.indexPathsForElements(in: rect) }
+            .filter{ $0.item != self.fetchResult.count || !SBPhotoConfigObject.share.canTakePictures }
             .map { indexPath in fetchResult.object(at: indexPath.item) }
         
         // Update the assets the PHCachingImageManager is caching.
@@ -610,8 +632,43 @@ extension StrangePhotoViewController: UICollectionViewDelegateFlowLayout{
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
-        let viewController = SBImageBrowserViewController(viewController: self, currentIndex: indexPath.row)
-        
-        self.present(viewController, animated: true, completion: nil)
+        if  SBPhotoConfigObject.share.canTakePictures && indexPath.item == self.fetchResult.count{
+            
+            if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                
+                let imagePickerController = UIImagePickerController()
+                
+                imagePickerController.sourceType = .camera
+                
+                imagePickerController.delegate = self
+                
+                self.present(imagePickerController, animated: true, completion: nil)
+                
+            }else{
+                
+                UIAlertController.show(self, message: "相机异常，请确认摄像头可用")
+            }
+            
+        }else{
+            
+            let viewController = SBImageBrowserViewController(viewController: self, currentIndex: indexPath.row)
+            
+            self.present(viewController, animated: true, completion: nil)
+        }
     }
 }
+
+extension StrangePhotoViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate{
+    
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            
+            UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        }
+        
+        self.dismiss(animated: true, completion: nil)
+    }
+}
+
+import MobileCoreServices

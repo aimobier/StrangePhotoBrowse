@@ -34,6 +34,10 @@ public class SBPhotoConfigObject {
     
     /// 选中 时候 是否显示 Index 选中的 Index
     public var pickerSelectIndexMode = true
+    
+    /// 拍照图片
+    public var photographImage = SBImageMake("takePicture")
+    
     /// 默认的图片 推荐大小 27*27
     public var pickerDefaultImage = SBImageMake("photo_def_photoPickerVc")
     /// 选中的图片 推荐大小 27*27 pickerSelectIndexMode 为true 则 不展示该 UIImage
@@ -59,4 +63,7 @@ public class SBPhotoConfigObject {
     
     /// IOS11 -> 全面屏 会默认的上下留空，设置该属性为true则可以不留空
     public var previewViewControllerTopBottomSpaceZero = false
+    
+    /// 是否可以拍照
+    public var canTakePictures = true
 }
