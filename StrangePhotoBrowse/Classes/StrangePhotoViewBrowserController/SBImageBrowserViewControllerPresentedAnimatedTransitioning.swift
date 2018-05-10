@@ -57,9 +57,13 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
         toViewController.bottomLayoutView.alpha = 0
         toViewController.toolBarView.alpha = 0
         
+        toViewController.collectionView.alpha = 0
+        
         toViewController.view.backgroundColor = toViewController.view.backgroundColor?.a0
         
         UIView.animate(withDuration: transitionDuration(using: transitionContext)-0.1) {
+            
+            toViewController.collectionView.alpha = 1
             
             toViewController.topLayoutView.alpha = 1
             toViewController.navgationBarView.alpha = 1
@@ -132,6 +136,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         UIView.animate(withDuration: self.transitionDuration(using: transitionContext)) {
             
             fromViewController.view.backgroundColor = fromViewController.view.backgroundColor?.a0
+            
+            fromViewController.collectionView.alpha = 0
             
             fromViewController.topLayoutView.alpha = 0
             fromViewController.navgationBarView.alpha = 0
@@ -321,6 +327,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         fromViewController.view.backgroundColor =  fromViewController.view.backgroundColor?.withAlphaComponent(1-progress) ?? .white
         
         if animateToHiddenTopAndBottomView {
+            
+            fromViewController.collectionView.alpha = 1-progress
             
             fromViewController.topLayoutView.alpha = 1-progress
             fromViewController.navgationBarView.alpha = 1-progress
