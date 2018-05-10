@@ -21,6 +21,9 @@ public class SBPhotoConfigObject {
     /// 每一行展示的照片数目
     public var perLineDisplayNumber = 4
     
+    /// 最大可以选择的数目
+    public var maxCanSelectNumber = 9
+    
     /// 上下方的 NavBar ToolBar Title Text Color
     public var navBarViewToolViewTitleTextColor = UIColor.white
     /// 上下方的 NavBar ToolBar Back Color

@@ -24,6 +24,8 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
     
     var delegate:SBPhotoCollectionViewCellDelegate?
     
+    let coverView = UIView()
+    
     required init?(coder aDecoder: NSCoder) {
         fatalError()
     }
@@ -43,6 +45,15 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
             NSLayoutConstraint(item: imageView, attribute: .bottom, relatedBy: .equal, toItem: contentView, attribute: .bottom, multiplier: 1, constant: 0),
             ])
         
+        coverView.backgroundColor = UIColor.white.a4
+        contentView.addSubview(coverView)
+        coverView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addConstraints([
+            NSLayoutConstraint(item: coverView, attribute: .top, relatedBy: .equal, toItem: contentView, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: coverView, attribute: .left, relatedBy: .equal, toItem: contentView, attribute: .left, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: coverView, attribute: .right, relatedBy: .equal, toItem: contentView, attribute: .right, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: coverView, attribute: .bottom, relatedBy: .equal, toItem: contentView, attribute: .bottom, multiplier: 1, constant: 0),
+            ])
         
         selectButton.addTarget(self, action: #selector(selectButtonClick), for: UIControlEvents.touchUpInside)
         selectButton.contentEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3)
