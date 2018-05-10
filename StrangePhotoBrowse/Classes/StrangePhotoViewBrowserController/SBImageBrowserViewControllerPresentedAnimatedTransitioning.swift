@@ -37,7 +37,6 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
 
         toSubViewController.imageView.frame = fromRect
         toSubViewController.imageView.contentMode = fromMode
-        toViewController.view.backgroundColor = toViewController.view.backgroundColor?.a0
 
         toViewController.topLayoutView.alpha = 0
         toViewController.navgationBarView.alpha = 0
@@ -45,21 +44,23 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
         toViewController.bottomLayoutView.alpha = 0
         toViewController.toolBarView.alpha = 0
         
-        UIView.animate(withDuration: transitionDuration(using: transitionContext)) {
+        toViewController.view.backgroundColor = toViewController.view.backgroundColor?.a0
+        
+        UIView.animate(withDuration: transitionDuration(using: transitionContext)-0.1) {
             
             toViewController.topLayoutView.alpha = 1
             toViewController.navgationBarView.alpha = 1
             
             toViewController.bottomLayoutView.alpha = 1
             toViewController.toolBarView.alpha = 1
+            
+            toViewController.view.backgroundColor = toViewController.view.backgroundColor?.a10
         }
         
         UIView.animate(withDuration: transitionDuration(using: transitionContext), delay: 0, usingSpringWithDamping: 0.67, initialSpringVelocity: 0, options: .curveEaseInOut, animations: {
             
             toSubViewController.imageView.frame = toRect
             toSubViewController.imageView.contentMode = toMode
-            
-            toViewController.view.backgroundColor = toViewController.view.backgroundColor?.withAlphaComponent(10)
             
         }) { (_) in
             
@@ -76,7 +77,7 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     func transitionDuration(using transitionContext: UIViewControllerContextTransitioning?) -> TimeInterval {
         
-        return 0.7
+        return 0.5
     }
     
     func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {

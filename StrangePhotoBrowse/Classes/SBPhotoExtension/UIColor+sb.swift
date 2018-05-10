@@ -54,4 +54,5 @@ extension UIColor{
     var a7: UIColor { return self.withAlphaComponent(0.7) }
     var a8: UIColor { return self.withAlphaComponent(0.8) }
     var a9: UIColor { return self.withAlphaComponent(0.9) }
+    var a10: UIColor { return self.withAlphaComponent(1) }
 }
