@@ -345,8 +345,12 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         /// 最大的不对的话 则配置 梦层 白色
         if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
             
-            let indexPaths = self.collectionView.indexPathsForVisibleItems.filter(){ !self.selectedAsset.contains(self.fetchResult.object(at: $0.row)) }
-            
+            let indexPaths = self.collectionView.indexPathsForVisibleItems
+                .filter{
+                    !($0.row == self.fetchResult.count && SBPhotoConfigObject.share.canTakePictures)
+                }.filter(){
+                    !self.selectedAsset.contains(self.fetchResult.object(at: $0.row))
+                }
             self.collectionView.reloadItems(at: indexPaths)
         }
     }

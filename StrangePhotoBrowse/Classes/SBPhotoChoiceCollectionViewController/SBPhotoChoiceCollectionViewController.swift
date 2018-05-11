@@ -82,16 +82,44 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     }
     
     private func sortOptions() -> PHFetchOptions{
-        
         let allPhotosOptions = PHFetchOptions()
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
+        allPhotosOptions.predicate = NSPredicate(format: "mediaType != %d", PHAssetMediaType.video.rawValue)
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         return allPhotosOptions
     }
     
     override func viewDidLoad() {
         
         allPhotos = PHAsset.fetchAssets(with: self.sortOptions())
-        smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: nil)
+        
+        let noVideo = PHFetchOptions()
+//        noVideo.predicate = NSPredicate(format: "(assetCollectionSubtype & %d) == 0 && (assetCollectionSubtype & %d) == 0", PHAssetCollectionSubtype.smartAlbumVideos,PHAssetCollectionSubtype.smartAlbumSlomoVideos)
+        
+//        noVideo.predicate = NSPredicate(format: "assetCollectionSubtype = %d", PHAssetCollectionSubtype.smartAlbumSlomoVideos.rawValue)
+        
+//        @available(iOS 8.0, *)
+//        open class PHAssetCollection : PHCollection {
+//
+//
+//            open var assetCollectionType: PHAssetCollectionType { get }
+//
+//            open var assetCollectionSubtype: PHAssetCollectionSubtype { get }
+//
+//
+//            // These counts are just estimates; the actual count of objects returned from a fetch should be used if you care about accuracy. Returns NSNotFound if a count cannot be quickly returned.
+//            open var estimatedAssetCount: Int { get }
+//
+//
+//            open var startDate: Date? { get }
+//
+//            open var endDate: Date? { get }
+//
+//
+//            open var approximateLocation: CLLocation? { get }
+//
+//            open var localizedLocationNames: [String] { get }
+        
+        smartAlbums = PHAssetCollection.fetchAssetCollections(with: .smartAlbum, subtype: .albumRegular, options: noVideo)
         userCollections = PHCollectionList.fetchTopLevelUserCollections(with: nil)
         
         PHPhotoLibrary.shared().register(self)
