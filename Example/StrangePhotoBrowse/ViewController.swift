@@ -15,7 +15,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        SBPhotoConfigObject.share.showGifInCollectionMainView = true
+        SBPhotoConfigObject.share.showGifInCollectionMainView = false
+        SBPhotoConfigObject.share.canTakePictures = true
         SBPhotoConfigObject.share.mainColor = UIColor(red: 26/255.0, green: 178/255.0, blue: 10/255.0, alpha: 1)
         
         SBPhotoConfigObject.share.collectionViewBackViewBackgroundColor = UIColor.black
