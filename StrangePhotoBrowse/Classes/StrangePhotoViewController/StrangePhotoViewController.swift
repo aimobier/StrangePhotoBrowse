@@ -46,6 +46,8 @@ public class StrangePhotoViewController: UIViewController{
     private var assetCollection: PHAssetCollection?
     var fetchResult: PHFetchResult<PHAsset>!
     
+    public var delegate:StrangePhotoViewControllerDelegate?
+    
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
         let allPhotosOptions = PHFetchOptions()
@@ -108,6 +110,17 @@ public class StrangePhotoViewController: UIViewController{
     deinit {
         
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+    }
+    
+    /// 配置该视图的 Delegate
+    ///
+    /// - Parameter delegate: 代理对象
+    /// - Returns: 视图
+    func makeDelegate(_ delegate:StrangePhotoViewControllerDelegate) -> StrangePhotoViewController {
+     
+        self.delegate = delegate
+        
+        return self
     }
 }
 
@@ -360,12 +373,16 @@ extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
     
     func didClickCloseButton(button: UIButton) {
         
+        self.delegate?.didCancel()
+        
         self.dismiss(animated: true, completion: nil)
     }
     
     func didClickSubmitButton(button: UIButton) {
         
-        print("发送")
+        self.delegate?.didFinish(images:  self.selectedAsset.images(), resources:  self.selectedAsset)
+        
+        self.dismiss(animated: true, completion: nil)
     }
 }
 
