@@ -84,7 +84,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     private func sortOptions() -> PHFetchOptions{
         let allPhotosOptions = PHFetchOptions()
         allPhotosOptions.predicate = NSPredicate(format: "mediaType != %d", PHAssetMediaType.video.rawValue)
-        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         return allPhotosOptions
     }
     
