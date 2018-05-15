@@ -29,7 +29,7 @@ class SBPhotoCollectionNavBarView: UIView {
     
     let closeButton = UIButton(type: .system)
     
-    var delegate:SBPhotoCollectionNavBarViewDelegate?
+    weak var delegate:SBPhotoCollectionNavBarViewDelegate?
     
     enum NavgationBarStyle{
         case normal

@@ -111,6 +111,10 @@ public class StrangePhotoViewController: UIViewController{
     deinit {
         
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+        
+        #if DEBUG
+        print("♻️ 相册主视图 成功销毁")
+        #endif
     }
     
     /// 配置该视图的 Delegate
@@ -380,19 +384,25 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
             viewController.navgationBarView.submitButton.isEnabled = isEnabled
         }
         
-        DispatchQueue.main.async {
+        DispatchQueue.main.async {[weak self] in
             
-            /// 最大的不对的话 则配置 梦层 白色
-            if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
-                
-                let indexPaths = self.collectionView.indexPathsForVisibleItems
-                    .filter{
-                        !($0.row == self.fetchResult.count && SBPhotoConfigObject.share.canTakePictures)
-                    }.filter(){
-                        !self.selectedAsset.contains(self.fetchResult.object(at: $0.row))
-                }
-                self.collectionView.reloadItems(at: indexPaths)
+            self?.reloadCoverView()
+        }
+    }
+    
+    /// 刷新 View
+    private func reloadCoverView(){
+        
+        /// 最大的不对的话 则配置 梦层 白色
+        if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
+            
+            let indexPaths = self.collectionView.indexPathsForVisibleItems
+                .filter{
+                    !($0.row == self.fetchResult.count && SBPhotoConfigObject.share.canTakePictures)
+                }.filter(){
+                    !self.selectedAsset.contains(self.fetchResult.object(at: $0.row))
             }
+            self.collectionView.reloadItems(at: indexPaths)
         }
     }
 }

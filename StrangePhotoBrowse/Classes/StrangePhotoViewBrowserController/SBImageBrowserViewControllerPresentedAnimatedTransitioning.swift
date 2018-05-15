@@ -40,6 +40,9 @@ class SBImageBrowserViewControllerPresentedAnimatedTransitioning: NSObject,UIVie
             return transitionContext.completeTransition(true)
         }
         
+        fromViewController.beginAppearanceTransition(false, animated: true)
+        toViewController.beginAppearanceTransition(true, animated: true)
+        
         let fromMode = cell.imageView.contentMode
         let toMode = toSubViewController.imageView.contentMode
         
@@ -222,6 +225,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             fromViewController.sbIsStatusBarHidden = false
             self.isHiddenStatusBar = fromViewController.sbIsStatusBarHidden
         }
+        
+        fromViewController.beginAppearanceTransition(true, animated: true)
     }
     
     @discardableResult
@@ -294,6 +299,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
     
     override func finish() {
 
+        fromViewController.beginAppearanceTransition(false, animated: true)
+        
         guard let cell = toCell else {
             
             self.transitionContext.completeTransition(true)

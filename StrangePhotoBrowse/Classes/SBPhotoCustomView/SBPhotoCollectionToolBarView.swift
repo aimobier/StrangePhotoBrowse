@@ -28,7 +28,7 @@ import UIKit
 
 class SBPhotoCollectionToolBarView: UIView {
     
-    var delegate:SBPhotoCollectionToolBarViewDelegate?
+    weak var delegate:SBPhotoCollectionToolBarViewDelegate?
     
     /// 预览按钮
     let previewButton = UIButton(type: .system)

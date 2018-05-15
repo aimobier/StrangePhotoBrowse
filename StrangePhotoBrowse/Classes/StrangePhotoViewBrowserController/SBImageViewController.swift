@@ -14,7 +14,7 @@ class SBImageViewController: UIViewController {
     var indexPage = 0
     
     let item:PHAsset
-    private let viewController: SBImageBrowserViewController
+    private weak var viewController: SBImageBrowserViewController!
     
     let scrollView = UIScrollView()
     let imageView = FLAnimatedImageView()
@@ -34,9 +34,10 @@ class SBImageViewController: UIViewController {
     init(asset:PHAsset,viewController: SBImageBrowserViewController){
         
         self.item = asset
-        self.viewController = viewController
         
         super.init(nibName: nil, bundle: nil)
+        
+        self.viewController = viewController
         
         if SBPhotoConfigObject.share.previewViewControllerTopBottomSpaceZero , #available(iOS 11.0, *) {
             scrollView.contentInsetAdjustmentBehavior = .never
@@ -91,9 +92,14 @@ class SBImageViewController: UIViewController {
         
         super.viewDidLoad()
         
+        let options = PHImageRequestOptions()
+        
+        /// 消除 Warnings  [ImageManager] First stage of an opportunistic image request returned a non-table format image, this is not fatal, but it is unexpected
+        options.deliveryMode = .highQualityFormat
+        
         if self.item.isGif {
             
-            PHImageManager.default().requestImageData(for: item, options: nil) { (data, _, _, _) in
+            PHImageManager.default().requestImageData(for: item, options: options) { (data, _, _, _) in
                 
                 guard let ndata = data else { return }
                 
@@ -101,7 +107,7 @@ class SBImageViewController: UIViewController {
             }
         }else{
             
-            PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: nil) {[weak self] (image, _) in
+            PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) {[weak self] (image, _) in
                 
                 self?.imageView.image = image
             }

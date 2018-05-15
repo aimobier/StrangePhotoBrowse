@@ -61,6 +61,8 @@ class SBPhotoChoiceCollectionViewControllerDismissedAnimatedTransitioning:NSObje
             fatalError("Boom sha ga la ga")
         }
         
+        fromViewController.beginAppearanceTransition(false, animated: true)
+        
         UIView.animate(withDuration: transitionDuration(using: transitionContext), animations: {
             
             fromViewController.view.backgroundColor = UIColor.black.a0
@@ -72,6 +74,8 @@ class SBPhotoChoiceCollectionViewControllerDismissedAnimatedTransitioning:NSObje
         }) { (_) in
             
             transitionContext.completeTransition(true)
+            
+            fromViewController.endAppearanceTransition()
         }
     }
 }

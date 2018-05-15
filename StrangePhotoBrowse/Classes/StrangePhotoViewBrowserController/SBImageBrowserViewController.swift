@@ -51,7 +51,7 @@ class SBImageBrowserViewController: UIPageViewController{
     var dismissedAnimatedTransitioning = SBImageBrowserViewControllerDismissedAnimatedTransitioning()
     var presentedAnimatedTransitioning = SBImageBrowserViewControllerPresentedAnimatedTransitioning()
     
-    let viewController: StrangePhotoViewController
+    weak var viewController: StrangePhotoViewController!
     
     /// ViewController 上方的View
     let topLayoutView = UIView()
@@ -80,11 +80,12 @@ class SBImageBrowserViewController: UIPageViewController{
         
         self.previewDs = previews
         self.ispreview = self.previewDs != nil
-        self.viewController = viewController
         
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: [
             UIPageViewControllerOptionInterPageSpacingKey: SBPhotoConfigObject.share.pageViewControllerOptionInterPageSpace
             ])
+        
+        self.viewController = viewController
         
 //        self.modalPresentationStyle = .custom
         self.transitioningDelegate = self
@@ -146,6 +147,13 @@ class SBImageBrowserViewController: UIPageViewController{
     }
     override var prefersStatusBarHidden: Bool{
         return self.sbIsStatusBarHidden
+    }
+    
+    deinit{
+    
+//        #if DEBUG
+        print("♻️ 相册浏览视图 成功销毁")
+//        #endif
     }
 }
 

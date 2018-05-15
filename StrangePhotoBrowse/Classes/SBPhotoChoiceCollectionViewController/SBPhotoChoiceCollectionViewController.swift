@@ -137,6 +137,10 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
     deinit {
         
         PHPhotoLibrary.shared().unregisterChangeObserver(self)
+        
+        #if DEBUG
+        print("♻️ 相册选择 成功销毁")
+        #endif
     }
 }
 

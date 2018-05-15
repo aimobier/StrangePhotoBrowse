@@ -8,7 +8,7 @@
 import UIKit
 import FLAnimatedImage
 
-protocol SBPhotoCollectionViewCellDelegate {
+protocol SBPhotoCollectionViewCellDelegate : class{
     
     /// 选中了 某个 Cell
     ///
@@ -22,7 +22,7 @@ class SBPhotoCollectionViewCell: UICollectionViewCell {
     
     let selectButton = SBPhotoCollectionButton(type: .system)
     
-    var delegate:SBPhotoCollectionViewCellDelegate?
+    weak var delegate:SBPhotoCollectionViewCellDelegate?
     
     let coverView = UIView()
     
