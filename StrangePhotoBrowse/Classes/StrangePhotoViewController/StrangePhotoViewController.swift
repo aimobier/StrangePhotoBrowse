@@ -411,7 +411,7 @@ extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
     
     func didClickCloseButton(button: UIButton) {
         
-        self.didClickCloseButton(button: button)
+        self.didClickSubmitButton(button: button)
     }
     
     func didClickSubmitButton(button: UIButton) {
