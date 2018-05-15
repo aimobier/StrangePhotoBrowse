@@ -51,6 +51,7 @@ public class StrangePhotoViewController: UIViewController{
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
         let allPhotosOptions = PHFetchOptions()
+        allPhotosOptions.predicate = NSPredicate(format: "mediaType != %d", PHAssetMediaType.video.rawValue)
         allPhotosOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: true)]
         return PHAsset.fetchAssets(with: allPhotosOptions)
     }()
@@ -116,11 +117,35 @@ public class StrangePhotoViewController: UIViewController{
     ///
     /// - Parameter delegate: 代理对象
     /// - Returns: 视图
-    func makeDelegate(_ delegate:StrangePhotoViewControllerDelegate) -> StrangePhotoViewController {
+    public func makeDelegate(_ delegate:StrangePhotoViewControllerDelegate) -> StrangePhotoViewController {
      
         self.delegate = delegate
         
         return self
+    }
+    
+    /// 取消选择 某一个已经选中的 照片
+    ///
+    /// - Parameter index: 选中照片的Index
+    public func unSelected(_ index:Int){
+        
+        guard let asset = self.selectedAsset[safe: index] else {
+            return
+        }
+        
+        self.unSelected(asset)
+    }
+    
+    /// 取消选择 某一个已经选中的 照片
+    ///
+    /// - Parameter asset: 资源文件
+    public func unSelected(_ asset:PHAsset)  {
+        
+        let indexPath = IndexPath(item: fetchResult.index(of: asset), section: 0)
+        
+        guard let cell = self.collectionView.cellForItem(at: indexPath) as? SBPhotoCollectionViewCell else { return }
+        
+        self.cellDidSelectButtonClick(cell)
     }
 }
 
@@ -355,16 +380,19 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
             viewController.navgationBarView.submitButton.isEnabled = isEnabled
         }
         
-        /// 最大的不对的话 则配置 梦层 白色
-        if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
+        DispatchQueue.main.async {
             
-            let indexPaths = self.collectionView.indexPathsForVisibleItems
-                .filter{
-                    !($0.row == self.fetchResult.count && SBPhotoConfigObject.share.canTakePictures)
-                }.filter(){
-                    !self.selectedAsset.contains(self.fetchResult.object(at: $0.row))
+            /// 最大的不对的话 则配置 梦层 白色
+            if SBPhotoConfigObject.share.maxCanSelectNumber-1 <= self.selectedAsset.count {
+                
+                let indexPaths = self.collectionView.indexPathsForVisibleItems
+                    .filter{
+                        !($0.row == self.fetchResult.count && SBPhotoConfigObject.share.canTakePictures)
+                    }.filter(){
+                        !self.selectedAsset.contains(self.fetchResult.object(at: $0.row))
                 }
-            self.collectionView.reloadItems(at: indexPaths)
+                self.collectionView.reloadItems(at: indexPaths)
+            }
         }
     }
 }
