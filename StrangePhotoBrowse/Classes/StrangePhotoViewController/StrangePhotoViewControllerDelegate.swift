@@ -8,15 +8,19 @@
 import Photos
 import Foundation
 
-public protocol StrangePhotoViewControllerDelegate {
+@objc public protocol StrangePhotoViewControllerDelegate {
+    
+    
+    /// 用户点击发送 这个时候开始处理图片 在 didFinish 处理完毕
+    @objc optional func willFinish()
     
     /// 用户确认完成
     ///
     /// - Parameters:
     ///   - images: 图片结合
     ///   - resources: 资源集合
-    func didFinish(images:[UIImage],resources:[PHAsset])
+    @objc optional func didFinish(images:[UIImage],resources:[PHAsset])
     
     /// 用户确认返回
-    func didCancel()
+    @objc optional func didCancel()
 }

@@ -411,14 +411,24 @@ extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
     
     func didClickCloseButton(button: UIButton) {
         
-        self.delegate?.didCancel()
+        if let void = self.delegate?.didCancel {
+            void()
+        }
         
         self.dismiss(animated: true, completion: nil)
     }
     
     func didClickSubmitButton(button: UIButton) {
+
+        if let void = self.delegate?.willFinish {
+            
+            void()
+        }
         
-        self.delegate?.didFinish(images:  self.selectedAsset.images(), resources:  self.selectedAsset)
+        if let void = self.delegate?.didFinish {
+            
+            void(self.selectedAsset.images(), self.selectedAsset)
+        }
         
         self.dismiss(animated: true, completion: nil)
     }
@@ -453,7 +463,10 @@ extension StrangePhotoViewController: SBPhotoCollectionToolBarViewDelegate, SBIm
     
     func browserDidClickSubmitButton(viewController: SBImageBrowserViewController, button: UIButton) {
         
-        self.didClickSubmitButton(button: button)
+        self.dismiss(animated: false) {[weak self] in
+            
+            self?.didClickSubmitButton(button: button)
+        }
     }
     
     /// 照片 浏览 视图 点击选择按钮

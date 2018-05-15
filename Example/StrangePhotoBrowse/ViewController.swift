@@ -24,7 +24,15 @@ class ViewController: UIViewController {
 
     @IBAction func click(_ sender: Any) {
         
-        self.present(StrangePhotoViewController(), animated: true, completion: nil)
+        self.present(StrangePhotoViewController().makeDelegate(self), animated: true, completion: nil)
     }
 }
 
+
+extension ViewController: StrangePhotoViewControllerDelegate{
+    
+    func didFinish(images: [UIImage], resources: [PHAsset]) {
+        
+        print(images)
+    }
+}
