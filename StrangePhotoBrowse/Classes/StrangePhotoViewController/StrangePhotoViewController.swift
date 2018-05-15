@@ -411,21 +411,17 @@ extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
     
     func didClickCloseButton(button: UIButton) {
         
-        if let void = self.delegate?.didCancel {
-            void()
-        }
-        
-        self.dismiss(animated: true, completion: nil)
+        self.didClickCloseButton(button: button)
     }
     
     func didClickSubmitButton(button: UIButton) {
 
-        if let void = self.delegate?.willFinish {
+        if let void = self.delegate?.strangePhotoViewControllerDelegateWillFinish {
             
             void()
         }
         
-        if let void = self.delegate?.didFinish {
+        if let void = self.delegate?.strangePhotoViewControllerDelegateDidFinish {
             
             void(self.selectedAsset.images(), self.selectedAsset)
         }

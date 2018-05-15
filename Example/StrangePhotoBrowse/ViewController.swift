@@ -31,7 +31,12 @@ class ViewController: UIViewController {
 
 extension ViewController: StrangePhotoViewControllerDelegate{
     
-    func didFinish(images: [UIImage], resources: [PHAsset]) {
+    /// <#Description#>
+    ///
+    /// - Parameters:
+    ///   - images: <#images description#>
+    ///   - resources: <#resources description#>
+    func strangePhotoViewControllerDelegateDidFinish(images: [UIImage], resources: [PHAsset]) {
         
         print(images)
     }

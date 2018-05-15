@@ -12,15 +12,12 @@ import Foundation
     
     
     /// 用户点击发送 这个时候开始处理图片 在 didFinish 处理完毕
-    @objc optional func willFinish()
+    @objc optional func strangePhotoViewControllerDelegateWillFinish()
     
     /// 用户确认完成
     ///
     /// - Parameters:
     ///   - images: 图片结合
     ///   - resources: 资源集合
-    @objc optional func didFinish(images:[UIImage],resources:[PHAsset])
-    
-    /// 用户确认返回
-    @objc optional func didCancel()
+    @objc optional func strangePhotoViewControllerDelegateDidFinish(images:[UIImage],resources:[PHAsset])
 }
