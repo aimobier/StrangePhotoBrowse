@@ -140,6 +140,7 @@ extension SBPhotoCollectionToolBarView{
     
     private func originalButtonMethod(){
         
+        self.originalButton.isHidden = true
         self.originalButton.setAttributedTitle("原图".withTextColor(SBPhotoConfigObject.share.navBarViewToolViewTitleTextColor).withFont(UIFont.f10.bold), for: .normal)
         self.originalButton.centerButtonAndImageWithSpace(4)
         self.originalButton.translatesAutoresizingMaskIntoConstraints = false
