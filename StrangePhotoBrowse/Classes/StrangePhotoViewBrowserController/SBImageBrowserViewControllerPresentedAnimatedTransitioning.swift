@@ -294,6 +294,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
                 
                 self.fromViewController.sbIsStatusBarHidden = self.isHiddenStatusBar
             }
+            
+            self.dealloc()
         }
     }
     
@@ -326,6 +328,8 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
             cell.isHidden = false
             
             self.transitionContext.completeTransition(true)
+            
+            self.dealloc()
         }
     }
 
@@ -349,5 +353,14 @@ class SBImageBrowserViewControllerDismissedAnimatedTransitioning: UIPercentDrive
         
         toViewController.bottomLayoutView.alpha = progress
         toViewController.toolBarView.alpha = progress
+    }
+    
+    func dealloc()  {
+        
+        self.transitionContext = nil
+        self.toViewController = nil
+        self.fromViewController = nil
+        self.fromSubViewController = nil
+        self.toCell = nil
     }
 }
