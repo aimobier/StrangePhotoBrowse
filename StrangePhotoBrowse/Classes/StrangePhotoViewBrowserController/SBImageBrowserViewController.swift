@@ -9,7 +9,7 @@ import UIKit
 import Photos
 import FLAnimatedImage
 
-protocol SBImageBrowserViewControllerDelegate {
+protocol SBImageBrowserViewControllerDelegate:class {
     
     /// 视图 是否点击 选择按钮
     func browserDidClickSelectButton(viewController:SBImageBrowserViewController,button: SBPhotoCollectionButton)
@@ -61,7 +61,7 @@ class SBImageBrowserViewController: UIPageViewController{
     let toolBarView = SBPhotoCollectionToolBarView(.preview)
     let bottomLayoutView = UIView()
     
-    var browserDelegate: SBImageBrowserViewControllerDelegate?
+    weak var browserDelegate: SBImageBrowserViewControllerDelegate?
     
     var collectionView:UICollectionView!
     /// 展示预览 视图的 UICollectionView

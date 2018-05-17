@@ -9,7 +9,7 @@ import UIKit
 import Photos
 import FLAnimatedImage
 
-protocol SBPhotoChoiceCollectionViewControllerDelegate {
+protocol SBPhotoChoiceCollectionViewControllerDelegate:class {
     
     /// 用户选择了 其他的相册
     ///
@@ -45,7 +45,7 @@ class SBPhotoChoiceCollectionViewController: UIViewController{
         static let count = 3
     }
     
-    private var delegate:SBPhotoChoiceCollectionViewControllerDelegate?
+    private weak var delegate:SBPhotoChoiceCollectionViewControllerDelegate?
     
     var allPhotos: PHFetchResult<PHAsset>!
     var smartAlbums: PHFetchResult<PHAssetCollection>!

@@ -46,7 +46,7 @@ public class StrangePhotoViewController: UIViewController{
     private var assetCollection: PHAssetCollection?
     var fetchResult: PHFetchResult<PHAsset>!
     
-    public var delegate:StrangePhotoViewControllerDelegate?
+    public weak var delegate:StrangePhotoViewControllerDelegate?
     
     /// 默认的全部照片
     private lazy var allPhotos: PHFetchResult<PHAsset> = {
