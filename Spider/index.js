@@ -6,7 +6,7 @@ const url = require('url');
 for (var i = 0; i < 18; i++) {
 
   request
-    .get('https://movie.douban.com/celebrity/1322189/photos/?=0')
+    .get('https://movie.douban.com/celebrity/1018990/photos/?=0')
     .query({ start: i*30 }) // query string
     .end((err, res) => {
       // Do something
