@@ -5,9 +5,17 @@
 [![License](https://img.shields.io/cocoapods/l/StrangePhotoBrowse.svg?style=flat)](https://cocoapods.org/pods/StrangePhotoBrowse)
 [![Platform](https://img.shields.io/cocoapods/p/StrangePhotoBrowse.svg?style=flat)](https://cocoapods.org/pods/StrangePhotoBrowse)
 
+## todo
+
+- [ ] Video Support
+- [ ] Edit model
+- [ ] Custom Camera
+
 ## Example
 
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
+
+![](preview/Kapture%202018-09-04%20at%2011.09.04.gif)
 
 ## Requirements
 
