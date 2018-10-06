@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Photos
 import FLAnimatedImage
 
 protocol SBPhotoCollectionViewCellDelegate : class{
@@ -17,6 +18,8 @@ protocol SBPhotoCollectionViewCellDelegate : class{
 }
 
 class SBPhotoCollectionViewCell: UICollectionViewCell {
+    
+    var requestID:PHImageRequestID?
     
     let imageView = FLAnimatedImageView()
     

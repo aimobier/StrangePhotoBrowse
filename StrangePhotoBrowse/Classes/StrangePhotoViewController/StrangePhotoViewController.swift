@@ -283,12 +283,12 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         
         cell.representedAssetIdentifier = asset.localIdentifier
         if asset.isGif && SBPhotoConfigObject.share.showGifInCollectionMainView {
-            imageManager.requestImageData(for: asset, options: nil) { (data, _, _, _) in
+            cell.requestID = imageManager.requestImageData(for: asset, options: nil) { (data, _, _, _) in
                 guard let ndata = data,cell.representedAssetIdentifier == asset.localIdentifier else { return }
                 cell.imageView.animatedImage = FLAnimatedImage(animatedGIFData: ndata)
             }
         }else{
-            imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
+            cell.requestID = imageManager.requestImage(for: asset, targetSize: thumbnailSize, contentMode: .aspectFill, options: nil, resultHandler: { image, _ in
                 if cell.representedAssetIdentifier == asset.localIdentifier {
                     cell.thumbnailImage = image
                 }
@@ -296,6 +296,13 @@ extension StrangePhotoViewController: UICollectionViewDataSource,SBPhotoCollecti
         }
         
         return cell
+    }
+    
+    /// 当 Cell 即将结束之后 返回这个Cell进行的Image请求
+    public func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        
+        guard let cell = cell as? SBPhotoCollectionViewCell,let requestId = cell.requestID else { return }
+        imageManager.cancelImageRequest(requestId)
     }
     
     /// 当用户点击了Cell中的选择按钮
