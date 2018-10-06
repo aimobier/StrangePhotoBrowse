@@ -433,7 +433,13 @@ extension StrangePhotoViewController: SBPhotoCollectionNavBarViewDelegate{
             void(self.selectedAsset.images(), self.selectedAsset)
         }
         
-        self.dismiss(animated: true, completion: nil)
+        if let _ = self.presentingViewController {
+        
+            self.presentingViewController?.dismiss(animated: true, completion: nil)
+        }else{
+        
+            self.dismiss(animated: true, completion: nil)
+        }
     }
 }
 

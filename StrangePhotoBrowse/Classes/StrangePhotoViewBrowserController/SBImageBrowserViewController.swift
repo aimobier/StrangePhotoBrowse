@@ -354,7 +354,9 @@ extension SBImageBrowserViewController: SBPhotoCollectionNavBarViewDelegate{
     
     func didClickSubmitButton(button: UIButton) {
         
-        self.browserDelegate?.browserDidClickSubmitButton(viewController: self, button: button)
+        self.viewController.didClickSubmitButton(button: button)
+        
+//        self.browserDelegate?.browserDidClickSubmitButton(viewController: self, button: button)
     }
     
     func didClickCancelButton(button: UIButton) {
