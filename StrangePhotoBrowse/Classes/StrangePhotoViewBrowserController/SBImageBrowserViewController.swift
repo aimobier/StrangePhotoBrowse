@@ -443,7 +443,7 @@ extension SBImageBrowserViewController: UICollectionViewDataSource, UICollection
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     
-        guard let asset = self.collectionDataSource[safe: indexPath.row],let cViewController = self.viewControllers?.first as? SBImageViewController else {
+        guard let asset = self.collectionDataSource[safe: indexPath.row],let cViewController = self.viewControllers?.first as? SBImageViewController,asset != cViewController.item else {
             return
         }
         
@@ -455,6 +455,7 @@ extension SBImageBrowserViewController: UICollectionViewDataSource, UICollection
             
             self.setViewControllers([viewController], direction: cViewController.indexPage > viewController.indexPage ? .reverse : .forward, animated: true, completion: nil)
             
+            pageViewController(self, didFinishAnimating: true, previousViewControllers: [viewController], transitionCompleted: true)
         }else{
             
             if self.viewController.fetchResult.contains(asset) {
@@ -463,15 +464,14 @@ extension SBImageBrowserViewController: UICollectionViewDataSource, UICollection
                 
                 viewController.indexPage = self.viewController.fetchResult.index(of: asset)
                 
-                return self.setViewControllers([viewController], direction: cViewController.indexPage > viewController.indexPage ? .reverse : .forward, animated: true, completion: nil)
-            }
+                self.setViewControllers([viewController], direction: cViewController.indexPage > viewController.indexPage ? .reverse : .forward, animated: true, completion: nil)
+                
+                pageViewController(self, didFinishAnimating: true, previousViewControllers: [viewController], transitionCompleted: true)
+            }else{
             
-            return UIAlertController.show(self.presentedViewController ?? self, message: "该照片不在本相册内，您可以选择“预览”来查看")
+                UIAlertController.show(self.presentedViewController ?? self, message: "该照片不在本相册内，您可以选择“预览”来查看")
+            }
         }
-        
-        self.updateToolBarViewSelectButton()
-        
-        self.changeIndexForRefreshCollectionView()
     }
     
     /// 改变 Index 方法
