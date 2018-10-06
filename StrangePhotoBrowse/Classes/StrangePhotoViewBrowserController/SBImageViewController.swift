@@ -111,9 +111,7 @@ class SBImageViewController: UIViewController {
             let fastOptions = PHImageRequestOptions()
             fastOptions.deliveryMode = .fastFormat
             
-            let size = CGSize(width: UIScreen.main.bounds.width*UIScreen.main.scale, height: UIScreen.main.bounds.width*(item.pixelWidth.f/item.pixelHeight.f)*UIScreen.main.scale)
-            
-            let fastRequest = PHImageManager.default().requestImage(for: item, targetSize: size, contentMode: .aspectFill, options: fastOptions) { [unowned self] (image, _) in
+            let fastRequest = PHImageManager.default().requestImage(for: item, targetSize: item.thumbnailSize, contentMode: .aspectFill, options: fastOptions) { [unowned self] (image, _) in
                 
                 self.imageView.image = image
             }

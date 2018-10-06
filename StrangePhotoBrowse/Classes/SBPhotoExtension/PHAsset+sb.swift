@@ -12,7 +12,7 @@ extension PHAsset{
     
     /// 是否为 gif
     var isGif:Bool{
-        if let identifier = self.value(forKey: "uniformTypeIdentifier") as? String,identifier == kUTTypeGIF as String{
+        if let identifier = value(forKey: "uniformTypeIdentifier") as? String,identifier == kUTTypeGIF as String{
             return true
         }
         return false
@@ -20,6 +20,32 @@ extension PHAsset{
     
     /// 是否为视频
     var isVideo:Bool{
-        return self.mediaType == .video
+        return mediaType == .video
+    }
+    
+    /// 是否横屏
+    var isLandscape:Bool{
+        return pixelHeight < pixelWidth
+    }
+    
+    /// 宽 : 高
+    var widthHeightScale:CGFloat{
+        return pixelWidth.f/pixelHeight.f
+    }
+    
+    /// 缩略图大小
+    var thumbnailSize:CGSize{
+        
+        let width:CGFloat
+        let height:CGFloat
+        
+        if isLandscape {
+            width = UIScreen.main.bounds.width
+            height = width/widthHeightScale
+        }else{
+            height = UIScreen.main.bounds.height
+            width = height*widthHeightScale
+        }
+        return CGSize(width: width, height: height)
     }
 }
