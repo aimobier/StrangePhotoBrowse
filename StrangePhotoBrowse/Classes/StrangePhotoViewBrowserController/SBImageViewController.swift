@@ -107,9 +107,21 @@ class SBImageViewController: UIViewController {
             }
         }else{
             
-            PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) {[weak self] (image, _) in
+            
+            let fastOptions = PHImageRequestOptions()
+            fastOptions.deliveryMode = .fastFormat
+            
+            let size = CGSize(width: UIScreen.main.bounds.width*UIScreen.main.scale, height: UIScreen.main.bounds.width*(item.pixelWidth.f/item.pixelHeight.f)*UIScreen.main.scale)
+            
+            let fastRequest = PHImageManager.default().requestImage(for: item, targetSize: size, contentMode: .aspectFill, options: fastOptions) { [unowned self] (image, _) in
                 
+                self.imageView.image = image
+            }
+            
+            PHImageManager.default().requestImage(for: item, targetSize: PHImageManagerMaximumSize, contentMode: .aspectFill, options: options) {[weak self] (image, _) in
+
                 self?.imageView.image = image
+                PHImageManager.default().cancelImageRequest(fastRequest)
             }
         }
         
